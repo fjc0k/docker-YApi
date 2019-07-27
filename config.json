@@ -1,0 +1,14 @@
+
+{
+  "port": "3000",
+  "adminAccount": "xxx@xx.xx",
+  "db": {
+    "servername": "yapi-mongo",
+    "DATABASE": "yapi",
+    "port": 27017
+  },
+  "mail": {
+    "enable": false
+  },
+  "closeRegister": true
+}
