@@ -5,9 +5,9 @@ services:
     image: jayfong/yapi:latest
     container_name: yapi-web
     ports:
-      - '40001:3000'
+      - 40001:3000
     volumes:
-      - './config.js:/yapi/config.js'
+      - ./config.js:/yapi/config.js
     depends_on:
       - yapi-mongo
     restart: unless-stopped
@@ -15,7 +15,7 @@ services:
     image: mongo:latest
     container_name: yapi-mongo
     volumes:
-      - './data/db:/data/db'
+      - ./data/db:/data/db
     expose:
-      - '27017'
+      - 27017
     restart: unless-stopped

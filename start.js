@@ -93,11 +93,11 @@ if (config.plugins && config.plugins.length) {
   // 安装插件
   const e = childProcess.exec(`
     cd /yapi/vendors
-    echo "=== 安装插件（可能需花费较长时间） ===\n"
-    echo "yarn add ${packages}"
-    yarn add ${packages}
+    echo "=== 安装插件 ===\n"
+    echo "npm install ${packages}"
+    npm install ${packages} --no-audit
     echo "=== 应用构建 ==="
-    yarn build-client
+    npm run build-client
   `)
   e.stdout.on('data', data => {
     addLog(String(data))
