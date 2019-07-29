@@ -4,10 +4,10 @@ services:
   yapi-web:
     image: jayfong/yapi:latest
     container_name: yapi-web
-    volumes:
-      - './config.json:/yapi/config.json'
     ports:
       - '40001:3000'
+    volumes:
+      - './config.js:/yapi/config.js'
     depends_on:
       - yapi-mongo
     restart: unless-stopped
