@@ -14,8 +14,7 @@ RUN wget ${YAPI_VENDOR_URL} \
 WORKDIR /yapi/vendors
 RUN echo -e "LICENSE*\n*.md\n*.yml\n*.yaml\n__*\n.*\n*.log\n*.ts" > .yarnclean
 RUN yarn install --production --ignore-optional --ignore-engines
-RUN rm -rf .history .github .eslintrc.js .yarnclean *.jpg *.md
-RUN echo -e "module.exports={}" > .eslintrc.js
+RUN rm -rf .history .github .yarnclean *.jpg *.md
 
 FROM node:alpine
 WORKDIR /yapi
