@@ -1,0 +1,5 @@
+language: bash
+
+script:
+  - chmod +x ./update.sh
+  - ./update.sh
