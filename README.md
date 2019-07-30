@@ -81,6 +81,10 @@ docker-compose pull yapi-web \
 docker-compose logs yapi-web
 ```
 
+## 如何迁移
+
+直接打包整个目录去新的服务器即可。
+
 ## 许可
 
 Jay Fong © MIT
