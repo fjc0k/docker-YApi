@@ -13,6 +13,6 @@ if [ $PROJECT_LATEST_TAG != $YAPI_LATEST_TAG ]; then
   sed -i '' "s#YAPI_VERSION=.*#YAPI_VERSION=$YAPI_LATEST_TAG#" Dockerfile
   git add Dockerfile
   git commit -m "feat: 升级 YApi 版本 [$YAPI_LATEST_TAG]"
-  git tag $YAPI_LATEST_TAG
+  git tag -a "$YAPI_LATEST_TAG" -m "YApi v$YAPI_LATEST_TAG"
   git push origin --follow-tags --quiet &> /dev/null
 fi
