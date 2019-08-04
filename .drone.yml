@@ -6,8 +6,20 @@ steps:
 - name: update
   image: alpine/git
   entrypoint: ["/bin/sh"]
+  environment:
+    GITHUB_TOKEN:
+      from_secret: github_access_token
   commands:
-    - git --version
-    - ls -a
     - chmod +x ./update.sh
+    - echo $GITHUB_TOKEN
+    - echo ${GITHUB_TOKEN}
+    - echo $$GITHUB_TOKEN
+    - echo $${GITHUB_TOKEN}
     - ./update.sh
+
+---
+kind: secret
+name: github_access_token
+get:
+  path: server/data/github.com
+  name: access_token
