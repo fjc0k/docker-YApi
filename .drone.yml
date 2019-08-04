@@ -1,0 +1,13 @@
+---
+kind: pipeline
+name: default
+
+steps:
+- name: update
+  image: alpine/git
+  entrypoint: ["/bin/sh"]
+  commands:
+    - git --version
+    - ls -a
+    - chmod +x ./update.sh
+    - ./update.sh
