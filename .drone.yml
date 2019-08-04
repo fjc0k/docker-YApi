@@ -11,10 +11,6 @@ steps:
       from_secret: github_access_token
   commands:
     - chmod +x ./update.sh
-    - echo $GITHUB_TOKEN
-    - echo ${GITHUB_TOKEN}
-    - echo $$GITHUB_TOKEN
-    - echo $${GITHUB_TOKEN}
     - ./update.sh
 
 ---
