@@ -2,13 +2,11 @@
 FROM node:alpine as source
 
 ENV YAPI_VERSION=1.8.1
-ENV YAPI_VENDOR_URL=https://registry.npm.taobao.org/yapi-vendor/download/yapi-vendor-${YAPI_VERSION}.tgz
 ENV YAPI_PKG_LOCK_URL=https://raw.githubusercontent.com/YMFE/yapi/v${YAPI_VERSION}/package-lock.json
 
 WORKDIR /yapi
 
-RUN apk add --no-cache wget
-RUN wget ${YAPI_VENDOR_URL} \
+RUN npm pack yapi-vendor@${YAPI_VERSION} \
   && tar -xzf *.tgz \
   && rm *.tgz \
   && mv package vendors
@@ -42,4 +40,4 @@ COPY start.js .
 
 EXPOSE 3000
 
-CMD [ "node", "./start.js" ]
+CMD ["node", "./start.js"]
