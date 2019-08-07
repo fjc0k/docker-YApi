@@ -1,7 +1,7 @@
 ######## 源码 ########
 FROM node:alpine as source
 
-ENV YAPI_VERSION=1.8.0
+ENV YAPI_VERSION=1.8.1
 ENV YAPI_VENDOR_URL=https://registry.npm.taobao.org/yapi-vendor/download/yapi-vendor-${YAPI_VERSION}.tgz
 ENV YAPI_PKG_LOCK_URL=https://raw.githubusercontent.com/YMFE/yapi/v${YAPI_VERSION}/package-lock.json
 
