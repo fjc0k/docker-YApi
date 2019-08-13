@@ -63,6 +63,8 @@ docker-compose restart yapi-web
 
 ## 如何升级
 
+<img src="https://badgen.net/github/tag/YMFE/yapi?label=YApi%20%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC"> <img src="https://badgen.net/github/tag/fjc0k/docker-YApi?label=docker-YApi%20%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC">
+
 若 `YApi` 有更新，本项目应会尽快跟进，之后，你可使用以下命令升级：
 
 ```bash

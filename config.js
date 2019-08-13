@@ -27,9 +27,6 @@ module.exports = {
   // 是否禁止注册
   closeRegister: true,
 
-  // 是否开启新版本通知
-  versionNotify: true,
-
   // 需安装的插件列表
   plugins: [
     // {

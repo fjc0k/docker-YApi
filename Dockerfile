@@ -6,26 +6,28 @@ ENV YAPI_PKG_LOCK_URL=https://raw.githubusercontent.com/YMFE/yapi/v${YAPI_VERSIO
 
 WORKDIR /yapi
 
-RUN npm pack yapi-vendor@${YAPI_VERSION} \
+COPY config.js .
+COPY start.js .
+
+RUN set -ex \
+  && apk add --no-cache python make gcc g++ \
+  && echo $( \
+      node -e "console.log(JSON.stringify(require('./config.js')))" \
+    ) > config.json \
+  && npm pack yapi-vendor@${YAPI_VERSION} \
   && tar -xzf *.tgz \
   && rm *.tgz \
-  && mv package vendors
-RUN cd vendors \
+  && mv package vendors \
+  && cd vendors \
   && wget ${YAPI_PKG_LOCK_URL} \
-  && rm -rf .history .github *.jpg *.md
-
-
-######## 依赖 ########
-FROM node:alpine as deps
-
-WORKDIR /yapi/vendors
-
-COPY --from=source /yapi/vendors/package.json /yapi/vendors/package-lock.json ./
-
-RUN apk add --no-cache python make gcc g++
-# 高版本 Node.js 下需升级 node-sass 版本
-RUN npm install node-sass --package-lock-only
-RUN npm ci
+  && sed -i -e 's|Alert,|Alert, Divider,|' ./client/components/Notify/Notify.js \
+  && sed -i -e 's|</a>|</a><Divider type="vertical" /><a target="view_window" href="https://github.com/fjc0k/docker-YApi#%E5%A6%82%E4%BD%95%E5%8D%87%E7%BA%A7">Docker 版升级指南</a>|' ./client/components/Notify/Notify.js \
+  && npm install node-sass --package-lock-only \
+  && npm ci \
+  && npm run build-client \
+  && rm -rf .history .github *.jpg *.md \
+  && cd node_modules \
+  && rm -rf .cache .happypack .ykit_cache
 
 
 ######## 镜像 ########
@@ -34,9 +36,6 @@ FROM node:alpine
 WORKDIR /yapi
 
 COPY --from=source /yapi .
-COPY --from=deps /yapi/vendors ./vendors
-COPY config.js .
-COPY start.js .
 
 EXPOSE 3000
 
