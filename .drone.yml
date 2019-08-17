@@ -12,6 +12,10 @@ steps:
     - chmod +x ./update.sh
     - ./update.sh
 
+trigger:
+  cron:
+    - update-yapi
+
 ---
 kind: secret
 name: github_access_token
