@@ -1,7 +1,7 @@
 ######## 源码 ########
 FROM node:alpine as source
 
-ENV YAPI_VERSION=1.8.2
+ENV YAPI_VERSION=1.8.3
 
 WORKDIR /yapi/vendors
 
