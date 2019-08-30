@@ -1,0 +1,28 @@
+name: Auto Update YApi
+
+on:
+  schedule:
+  - cron: * */1 * * *
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Update
+      run: |
+        PROJECT_LATEST_TAG=$(wget -q -O- "https://api.github.com/repos/${GITHUB_REPOSITORY}/tags" | grep '"name":' | sed -E 's#.*"(.+)".*#\1#' | head -n1)
+        YAPI_LATEST_TAG=$(wget -q -O- https://api.github.com/repos/YMFE/yapi/tags | grep '"name":' | sed -E 's#.*"v(.+)".*#\1#' | head -n1)
+
+        echo "YApi: $YAPI_LATEST_TAG"
+        echo "docker-YApi: $PROJECT_LATEST_TAG"
+
+        if [ $PROJECT_LATEST_TAG != $YAPI_LATEST_TAG ]; then
+          wget https://github.com/fjc0k/shx/raw/master/gha-gh-auth.sh && chmod +x gha-gh-auth.sh && ./gha-gh-auth.sh && rm -rf gha-gh-auth.sh
+          git checkout master
+          sed -i "s#YAPI_VERSION=.*#YAPI_VERSION=$YAPI_LATEST_TAG#" Dockerfile
+          git add Dockerfile
+          git commit -m "feat: 升级 YApi 版本 [$YAPI_LATEST_TAG]"
+          git tag -a "$YAPI_LATEST_TAG" -m "YApi v$YAPI_LATEST_TAG"
+          git push -u origin master --follow-tags
+        fi
