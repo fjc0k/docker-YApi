@@ -10,6 +10,8 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Update
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         PROJECT_LATEST_TAG=$(wget -q -O- "https://api.github.com/repos/${GITHUB_REPOSITORY}/tags" | grep '"name":' | sed -E 's#.*"(.+)".*#\1#' | head -n1)
         YAPI_LATEST_TAG=$(wget -q -O- https://api.github.com/repos/YMFE/yapi/tags | grep '"name":' | sed -E 's#.*"v(.+)".*#\1#' | head -n1)
