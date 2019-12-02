@@ -53,6 +53,63 @@ git clone https://github.com/fjc0k/docker-YApi.git
 }
 ```
 
+## 环境变量
+
+如果你熟悉 JavaScript，建议你在 `config.js` 进行相关配置。如果你不熟悉 JavaScript 或者有其他特殊需求，你可以通过环境变量完成配置。
+
+### 基础配置
+
+环境变量名称 | 类型 | 说明 | 示例
+--- | --- | --- | ---
+YAPI_ADMIN_ACCOUNT | string | 管理员账号（邮箱） | admin@foo.bar
+YAPI_ADMIN_PASSWORD | string | 管理员密码 | adm1n
+YAPI_CLOSE_REGISTER | boolean | 是否关闭注册 | true
+
+### 数据库配置
+
+环境变量名称 | 类型 | 说明 | 示例
+--- | --- | --- | ---
+YAPI_DB_SERVERNAME | string | MongoDB 服务地址 | yapi-mongo
+YAPI_DB_PORT | number | MongoDB 服务端口 | 27017
+YAPI_DB_DATABASE | string | 使用的 MongoDB 数据库 | yapi
+YAPI_DB_USER | string | 登录 MongoDB 服务的用户名 | root
+YAPI_DB_PASS | string | 登录 MongoDB 服务的用户密码 | r00t
+YAPI_DB_AUTH_SOURCE | string | MongoDB 身份认证所用库 | admin
+YAPI_DB_CONNECT_STRING | string | 使用 MongoDB 集群时配置 | mongodb://127.0.0.100:8418,127.0.0.101:8418/yapidb?slaveOk=true
+YAPI_DB_OPTIONS | json | Mongoose 连接 MongoDB 服务时的额外选项，一般不用设置。请参考: [Mongoose.prototype.connect()](https://mongoosejs.com/docs/api/mongoose.html#mongoose_Mongoose-connect) | {}
+
+### 邮件配置
+
+环境变量名称 | 类型 | 说明 | 示例
+--- | --- | --- | ---
+YAPI_MAIL_ENABLE | boolean | 是否启用 | true
+YAPI_MAIL_HOST | string | 邮件服务地址 | smtp.163.com
+YAPI_MAIL_PORT | number | 邮件服务端口 | 465
+YAPI_MAIL_FROM | string | 发送人邮箱 | foo@163.com
+YAPI_MAIL_AUTH_USER | string | 登录邮件服务器的用户名 | bar@163.com
+YAPI_MAIL_AUTH_PASS | string | 登录邮件服务器的用户密码 | f00bar
+
+### LDAP 登录配置
+
+环境变量名称 | 类型 | 说明 | 示例
+--- | --- | --- | ---
+YAPI_LDAP_LOGIN_ENABLE | boolean | 是否启用 | true
+YAPI_LDAP_LOGIN_SERVER | string | LDAP 服务地址 | ldap://ldap.foo.bar
+YAPI_LDAP_LOGIN_BASE_DN | string | 登录 LDAP 服务的用户名 | cn=admin,dc=foo,dc=bar
+YAPI_LDAP_LOGIN_BIND_PASSWORD | string | 登录 LDAP 服务的用户密码 | f00bar
+YAPI_LDAP_LOGIN_SEARCH_DN | string | 查询用户数据的路径 | ou=users,dc=foo,dc=bar
+YAPI_LDAP_LOGIN_SEARCH_STANDARD | string | 存储用户邮箱的字段 | mail
+YAPI_LDAP_LOGIN_EMAIL_POSTFIX | string | 登录邮箱后缀 | @163.com
+YAPI_LDAP_LOGIN_EMAIL_KEY | string | LDAP 数据库存储用户邮箱的字段 | mail
+YAPI_LDAP_LOGIN_USERNAME_KEY | string | LDAP 数据库存储用户名的字段 | name
+
+### 插件配置
+
+环境变量名称 | 类型 | 说明 | 示例
+--- | --- | --- | ---
+YAPI_PLUGINS | json | 要使用的插件列表 | [{"name":"interface-oauth2-token"},{"name":"gitlab","options":{}}]
+
+
 ## 如何重启
 
 若你修改了配置文件 `config.js`，务必重启应用才能生效：

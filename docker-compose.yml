@@ -7,7 +7,17 @@ services:
     ports:
       - 40001:3000
     volumes:
-      - ./config.js:/yapi/config.js
+      - ./start.js:/yapi/start.js
+    environment:
+      - YAPI_ADMIN_ACCOUNT=admin@hello.yapi
+      - YAPI_ADMIN_PASSWORD=hello
+      - YAPI_CLOSE_REGISTER=true
+      - YAPI_DB_SERVERNAME=yapi-mongo
+      - YAPI_DB_PORT=27017
+      - YAPI_DB_DATABASE=yapi
+      - YAPI_MAIL_ENABLE=false
+      - YAPI_LDAP_LOGIN_ENABLE=false
+      - YAPI_PLUGINS=[]
     depends_on:
       - yapi-mongo
     restart: unless-stopped
