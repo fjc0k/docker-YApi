@@ -7,7 +7,7 @@
 - [要求](#要求)
 - [安装](#安装)
 - [如何配置](#如何配置)
-  - [通过 config.js 配置 （不再建议使用）](#通过-configjs-配置-不再建议使用)
+  - [通过 config.json 或者 config.js 配置](#通过-configjson-或者-configjs-配置)
   - [通过环境变量配置](#通过环境变量配置)
     - [基础配置](#基础配置)
     - [数据库配置](#数据库配置)
@@ -42,13 +42,22 @@ git clone https://github.com/fjc0k/docker-YApi.git
 
 ## 如何配置
 
-### 通过 config.js 配置 （不再建议使用）
+为了减少二次配置，`docker-YApi` 新增了 `adminPassword` 选项以设置管理员密码。
 
-之前版本采用的是 `config.js` 的配置方案，现该方案已不再建议使用，因而此处不做展开，但依旧兼容。
+### 通过 config.json 或者 config.js 配置
+
+`config.json` 是 YApi 官方支持的配置文件，`config.js` 是 `docker-YApi` 扩展支持的配置文件，其实就是将 JSON 数据写成了更简洁的 JavaScript 对象。
+
+你可通过将外部的 `config.json` 或 `config.js` 配置文件映射进容器内部来使用它们：
+
+```bash
+./config.json:/yapi/config.json
+./config.js:/yapi/config.js
+```
 
 ### 通过环境变量配置
 
-为了减少二次配置，`docker-YApi` 支持通过 `YAPI_ADMIN_PASSWORD` 环境变量设置管理员密码。
+通过环境变量配置的选项会覆盖通过 `config.json` 或者 `config.js` 配置的选项。
 
 #### 基础配置
 
