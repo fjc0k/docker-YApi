@@ -7,7 +7,7 @@ WORKDIR /yapi/vendors
 
 SHELL ["/bin/bash", "-c"]
 
-RUN echo '{"adminAccount":"admin@hello.yapi","db":{"servername":"yapi-mongo","port":27017,"DATABASE":"yapi"},"mail":{"enable":false},"ldapLogin":{"enable":false},"closeRegister":true,"plugins":[]}' > /yapi/config.json
+RUN echo '{"adminAccount":"admin@docker.yapi","db":{"servername":"yapi-mongo","port":27017,"DATABASE":"yapi"},"mail":{"enable":false},"ldapLogin":{"enable":false},"closeRegister":true,"plugins":[]}' > /yapi/config.json
 RUN git clone -b "v${YAPI_VERSION}" --single-branch --depth 1 https://github.com/YMFE/yapi.git . \
   && rm -rf .git .github docs test *.{jpg,md} \
   && sed -i -e 's|Alert,|Alert, Divider,|' ./client/components/Notify/Notify.js \

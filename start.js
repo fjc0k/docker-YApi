@@ -3,7 +3,6 @@ const childProcess = require('child_process')
 const http = require('http')
 const merge = require('deepmerge')
 
-/** 辅助类 */
 class Helper {
   /**
    * 简单的 CONSTANT_CASE 实现。
@@ -33,7 +32,6 @@ class Helper {
   }
 }
 
-/** 配置解析器 */
 class ConfigParser {
   /**
    * 配置格式
@@ -90,7 +88,7 @@ class ConfigParser {
     return fs.existsSync('./config.js')
       ? require('./config.js')
       : fs.existsSync('./config.json')
-        ? require('./config.json')
+        ? JSON.parse(fs.readFileSync('./config.json').toString())
         : {}
   }
 
@@ -153,7 +151,6 @@ class ConfigParser {
   }
 }
 
-/** 引导服务 */
 class BootstrapServer {
   constructor(port) {
     this.port = port
@@ -161,10 +158,16 @@ class BootstrapServer {
     this.logs = []
   }
 
+  /**
+   * 日志记录。
+   */
   log(message) {
     this.logs.push(message)
   }
 
+  /**
+   * 打开引导服务。
+   */
   open() {
     this.server = http.createServer((req, res) => {
       res.setHeader('Connection', 'close')
@@ -207,6 +210,9 @@ class BootstrapServer {
     this.server.listen(this.port)
   }
 
+  /**
+   * 关闭引导服务。
+   */
   close() {
     return new Promise(resolve => {
       this.server.close(resolve)
@@ -218,18 +224,19 @@ class Main {
   constructor() {
     this.config = ConfigParser.extractConfig()
     this.bootstrapServer = new BootstrapServer(this.config.port)
-    this.log(`配置: ${JSON.stringify(this.config)}`)
-    fs.writeFileSync(
-      './config.json',
-      JSON.stringify(this.config),
-    )
   }
 
+  /**
+   * 日志记录。
+   */
   log(message) {
     console.log(message)
     this.bootstrapServer.log(message)
   }
 
+  /**
+   * 安装 YApi 插件。
+   */
   installPluginsIfNeeded() {
     return new Promise(resolve => {
       if (Array.isArray(this.config.plugins) && this.config.plugins.length) {
@@ -237,11 +244,9 @@ class Main {
           .map(plugin => `yapi-plugin-${plugin.name}`)
           .join(' ')
         const e = childProcess.exec(`
+          set -ex
           cd /yapi/vendors
-          echo "=== 安装插件 ===\n"
-          echo "npm install ${packages}"
           npm install ${packages} --no-audit
-          echo "=== 应用构建 ==="
           npm run build-client
         `)
         e.stdout.on('data', data => {
@@ -257,6 +262,9 @@ class Main {
     })
   }
 
+  /**
+   * 等待 MongoDB 服务可用。
+   */
   waitMongoDBAvailable() {
     return new Promise(resolve => {
       childProcess
@@ -271,7 +279,7 @@ class Main {
   }
 
   async start() {
-    this.log('开启引导服务...')
+    this.log('启动引导服务...')
     this.bootstrapServer.open()
 
     this.log('等待 MongoDB 服务可用...')
@@ -279,6 +287,13 @@ class Main {
 
     this.log('安装 YApi 插件...')
     await this.installPluginsIfNeeded()
+
+    this.log(`配置: ${JSON.stringify(this.config)}`)
+    this.log('写入配置...')
+    fs.writeFileSync(
+      './config.json',
+      JSON.stringify(this.config),
+    )
 
     this.log('尝试安装 YApi...')
     try {
