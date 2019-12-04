@@ -44,6 +44,10 @@ class ConfigParser {
     // 由 Docker-YApi 新增，
     // 在 Dockerfile 里有对相关文件进行修改以支持该配置的命令
     adminPassword: String,
+    // NPM 源：
+    // 由 Docker-YApi 新增，
+    // 目前仅在安装插件时使用
+    npmRegistry: String,
     closeRegister: Boolean,
     db: {
       servername: String,
@@ -246,7 +250,7 @@ class Main {
         const e = childProcess.exec(`
           set -ex
           cd /yapi/vendors
-          npm install ${packages} --no-audit
+          npm install ${packages} ${this.config.npmRegistry ? '--registry=' + this.config.npmRegistry : ''} --no-audit
           npm run build-client
         `)
         e.stdout.on('data', data => {
@@ -282,18 +286,18 @@ class Main {
     this.log('启动引导服务...')
     this.bootstrapServer.open()
 
+    this.log('写入配置...')
+    this.log(JSON.stringify(this.config, null, 2))
+    fs.writeFileSync(
+      './config.json',
+      JSON.stringify(this.config),
+    )
+
     this.log('等待 MongoDB 服务可用...')
     await this.waitMongoDBAvailable()
 
     this.log('安装 YApi 插件...')
     await this.installPluginsIfNeeded()
-
-    this.log(`配置: ${JSON.stringify(this.config)}`)
-    this.log('写入配置...')
-    fs.writeFileSync(
-      './config.json',
-      JSON.stringify(this.config),
-    )
 
     this.log('尝试安装 YApi...')
     try {

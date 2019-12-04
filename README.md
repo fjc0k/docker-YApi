@@ -66,6 +66,7 @@ git clone https://github.com/fjc0k/docker-YApi.git
 YAPI_ADMIN_ACCOUNT | string | 管理员账号（邮箱） | admin@foo.bar
 YAPI_ADMIN_PASSWORD | string | 管理员密码 | adm1n
 YAPI_CLOSE_REGISTER | boolean | 是否关闭注册 | true
+YAPI_NPM_REGISTRY | string | npm 源，目前仅在安装插件时使用，默认官方源，国内可以设为淘宝源加速 | https://registry.npm.taobao.org
 
 #### 数据库配置
 
