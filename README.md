@@ -103,7 +103,7 @@ YAPI_LDAP_LOGIN_SERVER | string | LDAP 服务地址 | ldap://ldap.foo.bar
 YAPI_LDAP_LOGIN_BASE_DN | string | 登录 LDAP 服务的用户名 | cn=admin,dc=foo,dc=bar
 YAPI_LDAP_LOGIN_BIND_PASSWORD | string | 登录 LDAP 服务的用户密码 | f00bar
 YAPI_LDAP_LOGIN_SEARCH_DN | string | 查询用户数据的路径 | ou=users,dc=foo,dc=bar
-YAPI_LDAP_LOGIN_SEARCH_STANDARD | string | 查询条件，其中 `%s` 会被 `username` 替换 | &(objectClass=user)(cn=%s)
+YAPI_LDAP_LOGIN_SEARCH_STANDARD | string | 支持两种值：<br />1、前端登录账号对应的查询字段，如：`mail`、`uid` 等；<br />2、自定义查询条件，其中 `%s` 会被前端登录账号替换，如：`&(objectClass=user)(cn=%s)` | -
 YAPI_LDAP_LOGIN_EMAIL_POSTFIX | string | 登录邮箱后缀 | @163.com
 YAPI_LDAP_LOGIN_EMAIL_KEY | string | LDAP 数据库存储用户邮箱的字段 | mail
 YAPI_LDAP_LOGIN_USERNAME_KEY | string | LDAP 数据库存储用户名的字段 | name
