@@ -149,8 +149,11 @@ class ConfigParser {
     const configFromFile = ConfigParser.extractConfigFromFile()
     const configFromEnv = ConfigParser.extractConfigFromEnv()
     const config = ConfigParser.mergeConfig(configFromFile, configFromEnv)
-    // 端口固定为 3000
-    Object.assign(config, { port: 3000 })
+    // 端口固定为 3000，但支持通过环境变量 PORT 改变
+    // 注: Heroku 必须使用 PORT 环境变量
+    Object.assign(config, {
+      port: process.env.PORT || 3000,
+    })
     return config
   }
 }
@@ -300,9 +303,11 @@ class Main {
     await this.installPluginsIfNeeded()
 
     this.log('尝试安装 YApi...')
-    try {
-      require('./vendors/server/install.js')
-    } catch (e) {}
+    await new Promise(resolve => {
+      childProcess
+        .exec('node ./vendors/server/install.js')
+        .on('exit', resolve)
+    })
 
     this.log('关闭引导服务...')
     await this.bootstrapServer.close()
