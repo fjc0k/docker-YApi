@@ -67,7 +67,7 @@ git clone https://github.com/fjc0k/docker-YApi.git
 --- | --- | --- | ---
 YAPI_ADMIN_ACCOUNT | string | 管理员账号（邮箱） | admin@foo.bar
 YAPI_ADMIN_PASSWORD | string | 管理员密码 | adm1n
-YAPI_CLOSE_REGISTER | boolean | 是否关闭注册 | true
+YAPI_CLOSE_REGISTER | boolean | 是否关闭注册，关闭注册后可通过插件 [yapi-plugin-add-user](https://www.npmjs.com/package/yapi-plugin-add-user) 新增用户 | true
 YAPI_NPM_REGISTRY | string | npm 源，目前仅在安装插件时使用，默认官方源，国内可以设为淘宝源加速 | https://registry.npm.taobao.org
 
 #### 数据库配置
@@ -114,7 +114,7 @@ YAPI_LDAP_LOGIN_USERNAME_KEY | string | LDAP 数据库存储用户名的字段 |
 
 环境变量名称 | 类型 | 说明 | 示例
 --- | --- | --- | ---
-YAPI_PLUGINS | json | 要使用的插件列表。[点击查看开源 YApi 插件列表→](https://www.npmjs.com/search?q=yapi-plugin-) | [{"name":"interface-oauth2-token"},{"name":"gitlab","options":{}}]
+YAPI_PLUGINS | json | 要使用的插件列表。[点击查看开源 YApi 插件列表→](https://www.npmjs.com/search?q=yapi-plugin-) | [{"name":"add-user"},{"name":"gitlab","options":{}}]
 
 
 ## 如何重启
