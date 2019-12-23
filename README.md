@@ -2,7 +2,7 @@
 
 在 [Docker](https://www.docker.com/) 中运行 [YApi](https://github.com/YMFE/yapi)。
 
-演示地址： [https://docker-yapi.herokuapp.com/](https://docker-yapi.herokuapp.com/)，仅供测试，每次部署都会重置，请不要将重要数据放在上面。
+演示地址： [https://docker-yapi.herokuapp.com/](https://docker-yapi.herokuapp.com/) （管理员账号：`admin@docker.yapi`，管理员密码：`adm1n`）。仅供测试，服务每次部署都会重置，请不要将重要数据放在上面。
 
 <!-- TOC depthFrom:2 -->
 
