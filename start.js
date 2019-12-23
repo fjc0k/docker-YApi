@@ -1,44 +1,89 @@
-const fs = require('fs')
-const childProcess = require('child_process')
-const http = require('http')
-const merge = require('deepmerge')
-
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const child_process_1 = __importDefault(require("child_process"));
+const fs_1 = __importDefault(require("fs"));
+const http_1 = __importDefault(require("http"));
+const deepmerge_1 = __importDefault(require("deepmerge"));
+// ==== 辅助函数 ====
 class Helper {
-  /**
-   * 简单的 CONSTANT_CASE 实现。
-   *
-   * @param {string} str 要转换的字符串
-   * @returns {string} 转换后的字符串
-   */
-  static constCase(str) {
-    return str
-      .replace(/(?<=[a-z])(?=[A-Z])/g, '_')
-      .toUpperCase()
-  }
-
-  /**
-   * 是否是假值。
-   *
-   * @param {string} value 要判断的值
-   * @returns {boolean} 是或否
-   */
-  static isFalsy(value) {
-    return [
-      'false', 'False', 'FALSE',
-      'off', 'Off', 'OFF',
-      'no', 'No', 'NO',
-      '0',
-    ].includes(value)
-  }
+    /**
+     * 简单的 CONSTANT_CASE 实现。
+     *
+     * @param str 要转换的字符串
+     * @returns 返回转换后的字符串
+     */
+    static constCase(str) {
+        return str
+            .replace(/(?<=[a-z])(?=[A-Z])/g, '_')
+            .toUpperCase();
+    }
+    /**
+     * 是否是假值。
+     *
+     * @param value 要判断的值
+     * @returns 返回判断结果
+     */
+    static isFalsy(value) {
+        return [
+            'false', 'False', 'FALSE',
+            'off', 'Off', 'OFF',
+            'no', 'No', 'NO',
+            '0',
+        ].includes(value);
+    }
+    /**
+     * 执行命令。
+     *
+     * @param cmd 要执行的命令
+     * @param log 记录执行过程
+     * @returns 返回执行结果
+     */
+    static async exec(cmd, log) {
+        return new Promise(resolve => {
+            const child = child_process_1.default.spawn('sh', ['-c', `set -ex\n${cmd}`], {
+                stdio: 'pipe',
+                cwd: process.cwd(),
+            });
+            let stdout = '';
+            let stderr = '';
+            child.stdout.on('data', data => {
+                log && log(String(data));
+                stdout += data;
+            });
+            child.stderr.on('data', data => {
+                log && log(String(data));
+                stderr += data;
+            });
+            child.on('error', error => {
+                resolve({ error, stdout, stderr, cmd });
+            });
+            child.on('close', code => {
+                resolve({ stdout, stderr, cmd, code });
+            });
+        });
+    }
+    /**
+     * 执行 JS 文件。
+     *
+     * @param path 文件路径
+     * @returns 返回执行结果
+     */
+    static async execJsFile(path) {
+        return Helper.exec(`
+      node -e "
+        process.on('unhandledRejection', () => process.exit(1))
+        require('${path}')
+      "
+    `);
+    }
 }
-
-class ConfigParser {
-  /**
-   * 配置格式
-   *
-   * @see https://hellosean1025.github.io/yapi/devops/index.html
-   */
-  static configShape = {
+// ==== 配置解析 ====
+// 配置格式
+// ref: https://hellosean1025.github.io/yapi/devops/index.html
+const configShape = {
     adminAccount: String,
     // 管理员密码：
     // 由 Docker-YApi 新增，
@@ -49,272 +94,237 @@ class ConfigParser {
     // 目前仅在安装插件时使用
     npmRegistry: String,
     closeRegister: Boolean,
+    port: Number,
     db: {
-      servername: String,
-      port: Number,
-      DATABASE: String,
-      user: String,
-      pass: String,
-      connectString: String,
-      authSource: String,
-      options: JSON,
-    },
-    mail: {
-      enable: Boolean,
-      host: String,
-      port: Number,
-      from: String,
-      auth: {
+        servername: String,
+        port: Number,
+        DATABASE: String,
         user: String,
         pass: String,
-      }
+        connectString: String,
+        authSource: String,
+        options: JSON,
+    },
+    mail: {
+        enable: Boolean,
+        host: String,
+        port: Number,
+        from: String,
+        auth: {
+            user: String,
+            pass: String,
+        },
     },
     ldapLogin: {
-      enable: Boolean,
-      server: String,
-      baseDn: String,
-      bindPassword: String,
-      searchDn: String,
-      searchStandard: String,
-      emailPostfix: String,
-      emailKey: String,
-      usernameKey: String,
+        enable: Boolean,
+        server: String,
+        baseDn: String,
+        bindPassword: String,
+        searchDn: String,
+        searchStandard: String,
+        emailPostfix: String,
+        emailKey: String,
+        usernameKey: String,
     },
     plugins: JSON,
-  }
-
-  /**
-   * 从文件获取配置。
-   *
-   * @returns 返回获取到的配置
-   */
-  static extractConfigFromFile() {
-    return fs.existsSync('./config.js')
-      ? require('./config.js')
-      : fs.existsSync('./config.json')
-        ? JSON.parse(fs.readFileSync('./config.json').toString())
-        : {}
-  }
-
-  /**
-   * 从环境变量获取配置。
-   *
-   * @param configCtx 配置上下文
-   * @param shapeCtx 格式上下文
-   * @param envPath 环境变量路径
-   * @returns 返回获取到的配置
-   */
-  static extractConfigFromEnv(
-    configCtx = {},
-    shapeCtx = ConfigParser.configShape,
-    envPath = ['YAPI'],
-  ) {
-    for (const [key, shape] of Object.entries(shapeCtx)) {
-      const KEY = Helper.constCase(key)
-      if (shape === JSON || typeof shape === 'function') {
-        const envKey = envPath.concat(KEY).join('_')
-        const envValue = process.env[envKey]
-        if (envValue != null) {
-          configCtx[key] = shape === Boolean
-            ? !Helper.isFalsy(envValue)
-            : shape === JSON
-              ? JSON.parse(envValue.trim())
-              : shape(envValue)
-        }
-      } else {
-        if (configCtx[key] == null) {
-          configCtx[key] = {}
-        }
-        ConfigParser.extractConfigFromEnv(configCtx[key], shape, envPath.concat(KEY))
-      }
+};
+class ConfigParser {
+    /**
+     * 从文件获取配置。
+     *
+     * @returns 返回获取到的配置
+     */
+    static extractConfigFromFile() {
+        return fs_1.default.existsSync('./config.js')
+            ? require('./config.js')
+            : fs_1.default.existsSync('./config.json')
+                ? JSON.parse(fs_1.default.readFileSync('./config.json').toString())
+                : {};
     }
-    return configCtx
-  }
-
-  /**
-   * 合并配置。
-   *
-   * @param config1 配置1
-   * @param config2 配置2
-   * @returns 返回合并后的配置
-   */
-  static mergeConfig(config1, config2) {
-    return merge(config1, config2)
-  }
-
-  /**
-   * 获取配置。
-   */
-  static extractConfig() {
-    const configFromFile = ConfigParser.extractConfigFromFile()
-    const configFromEnv = ConfigParser.extractConfigFromEnv()
-    const config = ConfigParser.mergeConfig(configFromFile, configFromEnv)
-    // 端口固定为 3000，但支持通过环境变量 PORT 改变
-    // 注: Heroku 必须使用 PORT 环境变量
-    Object.assign(config, {
-      port: process.env.PORT || 3000,
-    })
-    return config
-  }
+    /**
+     * 从环境变量获取配置。
+     *
+     * @param configCtx 配置上下文
+     * @param shapeCtx 格式上下文
+     * @param envPath 环境变量路径
+     * @returns 返回获取到的配置
+     */
+    static extractConfigFromEnv(configCtx = {}, shapeCtx = configShape, envPath = ['YAPI']) {
+        for (const [key, shape] of Object.entries(shapeCtx)) {
+            const KEY = Helper.constCase(key);
+            if (shape === JSON || typeof shape === 'function') {
+                const envKey = envPath.concat(KEY).join('_');
+                const envValue = process.env[envKey];
+                if (envValue != null) {
+                    configCtx[key] = shape === Boolean
+                        ? !Helper.isFalsy(envValue)
+                        : shape === JSON
+                            ? JSON.parse(envValue.trim())
+                            : shape(envValue);
+                }
+            }
+            else {
+                if (configCtx[key] == null) {
+                    configCtx[key] = {};
+                }
+                ConfigParser.extractConfigFromEnv(configCtx[key], shape, envPath.concat(KEY));
+            }
+        }
+        return configCtx;
+    }
+    /**
+     * 合并配置，配置2覆盖配置1。
+     *
+     * @param config1 配置1
+     * @param config2 配置2
+     * @returns 返回合并后的配置
+     */
+    static mergeConfig(config1, config2) {
+        return deepmerge_1.default(config1, config2, { arrayMerge: (_, source) => source });
+    }
+    /**
+     * 获取配置。
+     */
+    static extractConfig() {
+        const configFromFile = ConfigParser.extractConfigFromFile();
+        const configFromEnv = ConfigParser.extractConfigFromEnv();
+        const config = ConfigParser.mergeConfig(configFromFile, configFromEnv);
+        // 端口固定为 3000，但支持通过环境变量 PORT 改变
+        // 注: Heroku 必须使用 PORT 环境变量
+        Object.assign(config, {
+            port: process.env.PORT || 3000,
+        });
+        return config;
+    }
 }
-
+// ==== 引导服务 ====
 class BootstrapServer {
-  constructor(port) {
-    this.port = port
-    this.server = null
-    this.logs = []
-  }
-
-  /**
-   * 日志记录。
-   */
-  log(message) {
-    this.logs.push(message)
-  }
-
-  /**
-   * 打开引导服务。
-   */
-  open() {
-    this.server = http.createServer((req, res) => {
-      res.setHeader('Connection', 'close')
-      if (/\/logs$/.test(req.url)) {
-        res.setHeader('Content-Type', 'application/json; charset=utf-8')
-        res.end(JSON.stringify(this.logs))
-      } else {
-        res.setHeader('Content-Type', 'text/html; charset=utf-8')
-        res.end(`<!DOCTYPE html><html>
-          <head>
-            <meta charset="utf-8">
-            <title>YApi 正在启动...</title>
-            <script crossorigin="anonymous" src="https://polyfill.io/v3/polyfill.min.js?features=fetch"></script>
-          </head>
-          <body>
-            <h1>YApi 正在启动...</h1>
-            <hr />
-            <pre id="data"></pre>
-            <script>
-              function fetchData() {
-                var timer = setTimeout(fetchData, 500)
-                fetch('./logs')
-                  .then(function (res) {
-                    return res.json()
-                  })
-                  .then(function (data) {
-                    document.querySelector('#data').innerHTML = data.join('\\n')
-                  })
-                  .catch(function () {
-                    clearTimeout(timer)
-                    setTimeout(function () { location.reload() }, 2000)
-                  })
-              }
-              fetchData()
-            </script>
-          </body>
-        </html>`)
-      }
-    })
-    this.server.listen(this.port)
-  }
-
-  /**
-   * 关闭引导服务。
-   */
-  close() {
-    return new Promise(resolve => {
-      this.server.close(resolve)
-    })
-  }
+    constructor(port) {
+        this.port = port;
+        this.logs = [];
+    }
+    /**
+     * 日志记录。
+     */
+    log(message) {
+        this.logs.push(message);
+    }
+    /**
+     * 打开引导服务。
+     */
+    open() {
+        this.server = http_1.default.createServer((req, res) => {
+            res.setHeader('Connection', 'close');
+            if (/\/logs$/.test(req.url || '')) {
+                res.setHeader('Content-Type', 'application/json; charset=utf-8');
+                res.end(JSON.stringify(this.logs));
+            }
+            else {
+                res.setHeader('Content-Type', 'text/html; charset=utf-8');
+                res.end(`
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <title>docker-YApi</title>
+              <script crossorigin="anonymous" src="https://cdn.staticfile.org/fetch/3.0.0/fetch.min.js"></script>
+            </head>
+            <body>
+              <h1>YApi 正在启动...</h1>
+              <hr />
+              <pre id="data"></pre>
+              <script>
+                function fetchData() {
+                  var timer = setTimeout(fetchData, 500)
+                  fetch('./logs')
+                    .then(function (res) {
+                      return res.json()
+                    })
+                    .then(function (data) {
+                      document.querySelector('#data').innerHTML = data.join('\\n')
+                    })
+                    .catch(function () {
+                      clearTimeout(timer)
+                      setTimeout(function () { location.reload() }, 2000)
+                    })
+                }
+                fetchData()
+              </script>
+            </body>
+          </html>
+        `);
+            }
+        });
+        this.server.listen(this.port);
+    }
+    /**
+     * 关闭引导服务。
+     */
+    async close() {
+        return new Promise(resolve => {
+            this.server.close(resolve);
+        });
+    }
 }
-
+// ==== 入口 ====
 class Main {
-  constructor() {
-    this.config = ConfigParser.extractConfig()
-    this.bootstrapServer = new BootstrapServer(this.config.port)
-  }
-
-  /**
-   * 日志记录。
-   */
-  log(message) {
-    console.log(message)
-    this.bootstrapServer.log(message)
-  }
-
-  /**
-   * 安装 YApi 插件。
-   */
-  installPluginsIfNeeded() {
-    return new Promise(resolve => {
-      if (Array.isArray(this.config.plugins) && this.config.plugins.length) {
-        const packages = this.config.plugins
-          .map(plugin => `yapi-plugin-${plugin.name}`)
-          .join(' ')
-        const e = childProcess.exec(`
-          set -ex
+    constructor() {
+        this.config = ConfigParser.extractConfig();
+        this.bootstrapServer = new BootstrapServer(this.config.port);
+    }
+    /**
+     * 日志记录。
+     */
+    log(message) {
+        console.log(message);
+        this.bootstrapServer.log(message);
+    }
+    /**
+     * 安装 YApi 插件。
+     */
+    async installPluginsIfNeeded() {
+        if (Array.isArray(this.config.plugins) && this.config.plugins.length) {
+            const packages = this.config.plugins
+                .map(plugin => `yapi-plugin-${plugin.name}`)
+                .join(' ');
+            await Helper.exec(`
           cd /yapi/vendors
-          npm install ${packages} ${this.config.npmRegistry ? '--registry=' + this.config.npmRegistry : ''} --no-audit
+          npm install ${packages} ${this.config.npmRegistry ? `--registry=${this.config.npmRegistry}` : ''} --no-audit
           npm run build-client
-        `)
-        e.stdout.on('data', data => {
-          this.log(String(data))
-        })
-        e.stderr.on('data', data => {
-          this.log(String(data))
-        })
-        e.on('exit', resolve)
-      } else {
-        resolve()
-      }
-    })
-  }
-
-  /**
-   * 等待 MongoDB 服务可用。
-   */
-  waitMongoDBAvailable() {
-    return new Promise(resolve => {
-      childProcess
-        .exec(`
-          until nc -z ${this.config.db.servername} ${this.config.db.port || 27017}
-          do
-            sleep 0.5
-          done
-        `)
-        .on('exit', resolve)
-    })
-  }
-
-  async start() {
-    this.log('启动引导服务...')
-    this.bootstrapServer.open()
-
-    this.log('写入配置...')
-    this.log(JSON.stringify(this.config, null, 2))
-    fs.writeFileSync(
-      './config.json',
-      JSON.stringify(this.config),
-    )
-
-    this.log('等待 MongoDB 服务可用...')
-    await this.waitMongoDBAvailable()
-
-    this.log('安装 YApi 插件...')
-    await this.installPluginsIfNeeded()
-
-    this.log('尝试安装 YApi...')
-    await new Promise(resolve => {
-      childProcess
-        .exec('node ./vendors/server/install.js')
-        .on('exit', resolve)
-    })
-
-    this.log('关闭引导服务...')
-    await this.bootstrapServer.close()
-
-    this.log('尝试启动 YApi...')
-    require('./vendors/server/app.js')
-  }
+        `, message => this.log(message));
+        }
+    }
+    /**
+     * 等待 MongoDB 服务可用。
+     */
+    async waitMongoDBAvailable() {
+        await Helper.exec(`
+      until nc -z ${this.config.db.servername} ${this.config.db.port || 27017}
+      do
+        sleep 0.5
+      done
+    `);
+    }
+    async start() {
+        this.log('启动引导服务...');
+        this.bootstrapServer.open();
+        this.log('写入配置...');
+        this.log(JSON.stringify(this.config, null, 2));
+        fs_1.default.writeFileSync('./config.json', JSON.stringify(this.config));
+        this.log('等待 MongoDB 服务可用...');
+        await this.waitMongoDBAvailable();
+        this.log('安装 YApi 插件...');
+        await this.installPluginsIfNeeded();
+        this.log('尝试安装 YApi...');
+        await Helper.execJsFile('./vendors/server/install.js');
+        this.log('关闭引导服务...');
+        await this.bootstrapServer.close();
+        this.log('尝试启动 YApi...');
+        require('./vendors/server/app.js');
+    }
 }
-
-new Main().start()
+new Main()
+    .start()
+    .catch(err => {
+    throw err;
+});

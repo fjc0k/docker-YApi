@@ -1,0 +1,23 @@
+{
+  "scripts": {
+    "dev": "tsc -w",
+    "docker-build": "docker build -t jayfong/yapi:latest .",
+    "docker-down": "docker-compose down",
+    "docker-up": "docker-compose down && docker-compose up"
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": "io"
+  },
+  "eslintIgnore": [
+    "**/*.js"
+  ],
+  "dependencies": {
+    "@types/deepmerge": "^2.2.0",
+    "@types/node": "^12.12.21",
+    "deepmerge": "^4.2.2",
+    "eslint": "^6.8.0",
+    "eslint-config-io": "^0.8.2",
+    "typescript": "^3.7.4"
+  }
+}

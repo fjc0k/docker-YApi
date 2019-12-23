@@ -3,3 +3,6 @@
 *_cache
 *_temp
 data
+*.lock
+node_modules
+*.tsbuildinfo
