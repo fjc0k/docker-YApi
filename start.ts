@@ -79,15 +79,11 @@ class Helper {
    * 执行 JS 文件。
    *
    * @param path 文件路径
+   * @param log 记录执行过程
    * @returns 返回执行结果
    */
-  static async execJsFile(path: string) {
-    return Helper.exec(`
-      node -e "
-        process.on('unhandledRejection', () => process.exit(1))
-        require('${path}')
-      "
-    `)
+  static async execJsFile(path: string, log?: (message: string) => any) {
+    return Helper.exec(`node --unhandled-rejections=strict ${path}`, log)
   }
 }
 
@@ -137,7 +133,12 @@ const configShape = {
     emailKey: String,
     usernameKey: String,
   },
-  plugins: JSON,
+  plugins: [
+    {
+      name: String,
+      options: JSON,
+    },
+  ],
 } as const
 
 type IConfigShape = typeof configShape
@@ -151,7 +152,9 @@ type GetType<T extends Record<any, any>> = {
         ? number
         : T[K] extends Record<any, any>
           ? GetType<T[K]>
-          : any
+          : T[K] extends [infer P]
+            ? Array<GetType<P>>
+            : any
 }
 
 type IConfig = GetType<IConfigShape>
@@ -185,13 +188,13 @@ class ConfigParser {
   ): IConfig {
     for (const [key, shape] of Object.entries(shapeCtx)) {
       const KEY = Helper.constCase(key)
-      if (shape === JSON || typeof shape === 'function') {
+      if (Array.isArray(shape) || (shape as any) === JSON || typeof shape === 'function') {
         const envKey = envPath.concat(KEY).join('_')
         const envValue = process.env[envKey]
         if (envValue != null) {
           (configCtx as any)[key] = shape === Boolean
             ? !Helper.isFalsy(envValue)
-            : shape === JSON
+            : (Array.isArray(shape) || (shape as any) === JSON)
               ? JSON.parse(envValue.trim())
               : (shape as any)(envValue)
         }
@@ -332,7 +335,7 @@ class Main {
    * 安装 YApi 插件。
    */
   async installPluginsIfNeeded() {
-    if (Array.isArray(this.config.plugins) && this.config.plugins.length) {
+    if (Array.isArray(this.config.plugins) && this.config.plugins.length > 0) {
       const packages = this.config.plugins
         .map(plugin => `yapi-plugin-${plugin.name}`)
         .join(' ')
@@ -374,7 +377,7 @@ class Main {
     await this.installPluginsIfNeeded()
 
     this.log('尝试安装 YApi...')
-    await Helper.execJsFile('./vendors/server/install.js')
+    await Helper.execJsFile('./vendors/server/install.js', message => this.log(message))
 
     this.log('关闭引导服务...')
     await this.bootstrapServer.close()

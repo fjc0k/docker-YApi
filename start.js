@@ -69,15 +69,11 @@ class Helper {
      * 执行 JS 文件。
      *
      * @param path 文件路径
+     * @param log 记录执行过程
      * @returns 返回执行结果
      */
-    static async execJsFile(path) {
-        return Helper.exec(`
-      node -e "
-        process.on('unhandledRejection', () => process.exit(1))
-        require('${path}')
-      "
-    `);
+    static async execJsFile(path, log) {
+        return Helper.exec(`node --unhandled-rejections=strict ${path}`, log);
     }
 }
 // ==== 配置解析 ====
@@ -126,7 +122,12 @@ const configShape = {
         emailKey: String,
         usernameKey: String,
     },
-    plugins: JSON,
+    plugins: [
+        {
+            name: String,
+            options: JSON,
+        },
+    ],
 };
 class ConfigParser {
     /**
@@ -152,13 +153,13 @@ class ConfigParser {
     static extractConfigFromEnv(configCtx = {}, shapeCtx = configShape, envPath = ['YAPI']) {
         for (const [key, shape] of Object.entries(shapeCtx)) {
             const KEY = Helper.constCase(key);
-            if (shape === JSON || typeof shape === 'function') {
+            if (Array.isArray(shape) || shape === JSON || typeof shape === 'function') {
                 const envKey = envPath.concat(KEY).join('_');
                 const envValue = process.env[envKey];
                 if (envValue != null) {
                     configCtx[key] = shape === Boolean
                         ? !Helper.isFalsy(envValue)
-                        : shape === JSON
+                        : (Array.isArray(shape) || shape === JSON)
                             ? JSON.parse(envValue.trim())
                             : shape(envValue);
                 }
@@ -283,7 +284,7 @@ class Main {
      * 安装 YApi 插件。
      */
     async installPluginsIfNeeded() {
-        if (Array.isArray(this.config.plugins) && this.config.plugins.length) {
+        if (Array.isArray(this.config.plugins) && this.config.plugins.length > 0) {
             const packages = this.config.plugins
                 .map(plugin => `yapi-plugin-${plugin.name}`)
                 .join(' ');
@@ -316,7 +317,7 @@ class Main {
         this.log('安装 YApi 插件...');
         await this.installPluginsIfNeeded();
         this.log('尝试安装 YApi...');
-        await Helper.execJsFile('./vendors/server/install.js');
+        await Helper.execJsFile('./vendors/server/install.js', message => this.log(message));
         this.log('关闭引导服务...');
         await this.bootstrapServer.close();
         this.log('尝试启动 YApi...');
