@@ -121,6 +121,9 @@ const configShape = {
       user: String,
       pass: String,
     },
+    tls: {
+      rejectUnauthorized: Boolean
+    },
   },
   ldapLogin: {
     enable: Boolean,
@@ -274,25 +277,25 @@ class BootstrapServer {
               <script crossorigin="anonymous" src="https://cdn.staticfile.org/fetch/3.0.0/fetch.min.js"></script>
             </head>
             <body>
-              <h1>YApi 正在启动...</h1>
+              <h1>YApi 启动中...</h1>
               <hr />
-              <pre id="data"></pre>
+              <pre id="message"></pre>
               <script>
                 function fetchData() {
-                  var timer = setTimeout(fetchData, 500)
+                  var timer = setTimeout(fetchData, 500);
                   fetch('./logs')
                     .then(function (res) {
-                      return res.json()
+                      return res.json();
                     })
                     .then(function (data) {
-                      document.querySelector('#data').innerHTML = data.join('\\n')
+                      document.querySelector('#message').innerHTML = "配置加载完成，正在加载...";
                     })
                     .catch(function () {
-                      clearTimeout(timer)
-                      setTimeout(function () { location.reload() }, 2000)
+                      clearTimeout(timer);
+                      setTimeout(function () { location.reload() }, 2000);
                     })
                 }
-                fetchData()
+                fetchData();
               </script>
             </body>
           </html>

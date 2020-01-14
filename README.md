@@ -93,6 +93,7 @@ YAPI_MAIL_PORT | number | 邮件服务端口 | 465
 YAPI_MAIL_FROM | string | 发送人邮箱 | foo@163.com
 YAPI_MAIL_AUTH_USER | string | 登录邮件服务的用户名 | bar@163.com
 YAPI_MAIL_AUTH_PASS | string | 登录邮件服务的用户密码 | f00bar
+YAPI_MAIL_TLS_REJECT_UNAUTHORIZED | boolean | 登录邮件服务的验证 | false
 
 #### LDAP 登录配置
 
