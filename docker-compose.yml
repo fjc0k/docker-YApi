@@ -18,6 +18,8 @@ services:
       - YAPI_PLUGINS=[]
     depends_on:
       - yapi-mongo
+    links:
+      - yapi-mongo
     restart: unless-stopped
   yapi-mongo:
     image: mongo:latest
