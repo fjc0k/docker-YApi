@@ -280,9 +280,11 @@ class Main {
     /**
      * 日志记录。
      */
-    log(message) {
+    log(message, sendToClient = false) {
         console.log(message);
-        this.bootstrapServer.log(message);
+        if (sendToClient) {
+            this.bootstrapServer.log(message);
+        }
     }
     /**
      * 写入配置。
@@ -321,20 +323,20 @@ class Main {
     `);
     }
     async start() {
-        this.log('启动引导服务...');
+        this.log('启动引导服务...', true);
         this.bootstrapServer.open();
-        this.log('写入配置...');
+        this.log('写入配置...', true);
         this.log(JSON.stringify(this.config, null, 2));
         this.writeConfig(this.config);
-        this.log('等待 MongoDB 服务可用...');
+        this.log('等待 MongoDB 服务可用...', true);
         await this.waitMongoDBAvailable();
-        this.log('安装 YApi 插件...');
+        this.log('安装 YApi 插件...', true);
         await this.installPluginsIfNeeded();
-        this.log('尝试安装 YApi...');
+        this.log('尝试安装 YApi...', true);
         await Helper.execJsFile('./vendors/server/install.js', message => this.log(message));
-        this.log('关闭引导服务...');
+        this.log('关闭引导服务...', true);
         await this.bootstrapServer.close();
-        this.log('尝试启动 YApi...');
+        this.log('尝试启动 YApi...', true);
         require('./vendors/server/app.js');
     }
 }
