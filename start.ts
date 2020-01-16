@@ -121,6 +121,10 @@ const configShape = {
       user: String,
       pass: String,
     },
+    // 传递给 NodeMailer 的额外参数：
+    // 由 Docker-YApi 新增，
+    // ref: https://nodemailer.com/smtp/
+    options: JSON,
   },
   ldapLogin: {
     enable: Boolean,
@@ -332,6 +336,17 @@ class Main {
   }
 
   /**
+   * 写入配置。
+   */
+  writeConfig(config: IConfig) {
+    const finalConfig = JSON.parse(JSON.stringify(config))
+    const mailOptions = finalConfig.mail.options || {}
+    delete finalConfig.mail.options
+    finalConfig.mail = merge(finalConfig.mail, mailOptions)
+    fs.writeFileSync('./config.json', JSON.stringify(finalConfig))
+  }
+
+  /**
    * 安装 YApi 插件。
    */
   async installPluginsIfNeeded() {
@@ -368,7 +383,7 @@ class Main {
 
     this.log('写入配置...')
     this.log(JSON.stringify(this.config, null, 2))
-    fs.writeFileSync('./config.json', JSON.stringify(this.config))
+    this.writeConfig(this.config)
 
     this.log('等待 MongoDB 服务可用...')
     await this.waitMongoDBAvailable()
