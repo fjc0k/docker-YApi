@@ -115,7 +115,7 @@ YAPI_LDAP_LOGIN_USERNAME_KEY | string | LDAP 数据库存储用户名的字段 |
 
 环境变量名称 | 类型 | 说明 | 示例
 --- | --- | --- | ---
-YAPI_PLUGINS | json | 要使用的插件列表。[点击查看开源 YApi 插件列表→](https://www.npmjs.com/search?q=yapi-plugin-)<br />**注意:** 安装插件会运行 YApi 自带的打包命令，其内存消耗较大，因此，在安装插件时，物理机可用内存最好大于 `1GB`，否则，易出现内存溢出错误，导致插件安装失败。 | [{"name":"add-user"},{"name":"gitlab","options":{}}]
+YAPI_PLUGINS | json | 要使用的插件列表。[点击查看开源 YApi 插件列表→](https://www.npmjs.com/search?q=yapi-plugin-)<br /><br />**配置项数据格式：**<br />{<br />  "name": "插件名称",<br />  "options": "插件配置"<br />}<br /><br />**注意：**<br />安装插件会运行 YApi 自带的打包命令，其内存消耗较大，因此，在安装插件时，物理机可用内存最好大于 `1GB`，否则，易出现内存溢出错误，导致插件安装失败。 | [{"name":"add-user"},{"name":"gitlab","options":{}}]
 
 
 ## 如何重启
