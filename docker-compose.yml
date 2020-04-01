@@ -9,7 +9,7 @@ services:
     environment:
       - YAPI_ADMIN_ACCOUNT=admin@docker.yapi
       - YAPI_ADMIN_PASSWORD=adm1n
-      - YAPI_CLOSE_REGISTER=true
+      - YAPI_CLOSE_REGISTER=false
       - YAPI_DB_SERVERNAME=yapi-mongo
       - YAPI_DB_PORT=27017
       - YAPI_DB_DATABASE=yapi
