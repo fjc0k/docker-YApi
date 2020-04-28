@@ -1,0 +1,21 @@
+name: Publish to Docker Hub
+
+on:
+  push:
+    tags:
+      - '*.*.*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: set up docker-buildx
+      uses: crazy-max/ghaction-docker-buildx@v1
+      with:
+        version: latest
+    - name: build & publish
+      run: |
+        VERSION=${GITHUB_REF:10}
+        docker login -u jayfong -p ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+        docker buildx build --platform linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x --push -t jayfong/yapi:latest -t jayfong/yapi:${VERSION} .

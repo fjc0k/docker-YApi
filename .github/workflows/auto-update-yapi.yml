@@ -28,3 +28,6 @@ jobs:
           git tag -a "$YAPI_LATEST_TAG" -m "YApi v$YAPI_LATEST_TAG"
           git push -u origin master --follow-tags
         fi
+
+        # Heroku 保活
+        wget -q https://docker-yapi.herokuapp.com/
