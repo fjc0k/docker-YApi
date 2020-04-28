@@ -1,7 +1,7 @@
 ######## 构建 ########
 FROM jayfong/front-end-builder:latest as builder
 
-ENV YAPI_VERSION=1.8.9
+ENV YAPI_VERSION=1.9.0
 
 WORKDIR /yapi/vendors
 
