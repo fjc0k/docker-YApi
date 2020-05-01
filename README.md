@@ -2,7 +2,17 @@
 
 在 [Docker](https://www.docker.com/) 中运行 [YApi](https://github.com/YMFE/yapi)。
 
-演示地址： [https://docker-yapi.herokuapp.com/](https://docker-yapi.herokuapp.com/) （管理员账号：`admin@docker.yapi`，管理员密码：`adm1n`）。仅供测试，服务每次部署都会重置，请不要将重要数据放在上面。
+-----
+
+演示地址： [https://docker-yapi.herokuapp.com/](https://docker-yapi.herokuapp.com/) 
+
+管理员账号：`admin@docker.yapi`
+
+管理员密码：`adm1n`
+
+仅供测试，服务每次部署都会重置，请不要将重要数据放在上面。
+
+-----
 
 <!-- TOC depthFrom:2 -->
 
@@ -20,6 +30,8 @@
 - [如何升级](#如何升级)
 - [查看日志](#查看日志)
 - [如何迁移](#如何迁移)
+- [play 版说明](#play-版说明)
+- [YApi 相关资源推荐](#yapi-相关资源推荐)
 - [许可](#许可)
 
 <!-- /TOC -->
@@ -154,6 +166,33 @@ docker-compose logs yapi-web
 ## 如何迁移
 
 直接打包整个目录去新的服务器即可。
+
+## play 版说明
+
+本项目额外提供了一个开箱即用的 play 版本（内置了数据库），你可通过它对 YApi 作一个大概的了解：
+
+```bash
+docker run --rm -p 40001:3000 jayfong/yapi:play
+```
+
+你可在本地或 [https://labs.play-with-docker.com/](https://labs.play-with-docker.com/) 上运行上面的命令，然后打开 `http://localhost:40001` 体验 YApi。
+
+> 默认的管理员账号：`admin@docker.yapi`，管理员密码：`adm1n`。
+
+
+## YApi 相关资源推荐
+
+- [YApi-X](https://github.com/fjc0k/YApi-X#readme)
+
+  YApi 二次开发版，进行了很多功能上的增强，原生支持 Docker 安装。
+
+- [YApi-X 浏览器插件](https://github.com/fjc0k/YApi-X/tree/master/chrome-extension#readme)
+
+  为 YApi-X 开发的浏览器跨域与文件上传插件，同时支持 YApi 官方版。
+
+- [YApi to TypeScript](https://github.com/fjc0k/yapi-to-typescript#readme)
+
+  根据 YApi 的接口定义生成 TypeScript 的接口类型及其请求函数代码，同时支持生成 React Hooks 代码。
 
 ## 许可
 
