@@ -6,11 +6,10 @@
     "docker-up": "docker-compose down && docker-compose up"
   },
   "dependencies": {
-    "@types/fs-extra": "^9.0.1",
-    "@types/node": "^12.12.21",
-    "deepmerge": "^4.2.2",
-    "fs-extra": "^9.0.0",
-    "typescript": "^3.9.3",
-    "vtils": "^2.59.0"
+    "@types/fs-extra": "9.0.1",
+    "@types/node": "12.12.21",
+    "deepmerge": "4.2.2",
+    "fs-extra": "9.0.0",
+    "typescript": "3.9.3"
   }
 }
