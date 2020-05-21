@@ -236,9 +236,7 @@ class ConfigParser {
    * @returns 返回合并后的配置
    */
   static mergeConfig(config1: IConfig, config2: IConfig): IConfig {
-    const config = merge(config1, config2, {
-      arrayMerge: (_, source) => source
-    })
+    const config = merge(config1, config2)
     const plugins: IConfig['plugins'][0][] = []
     for (const plugin of [...(config.plugins || [])].reverse()) {
       if (!plugins.find((item) => item.name === plugin.name)) {
