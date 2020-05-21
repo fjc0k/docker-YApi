@@ -15,7 +15,8 @@ COPY prepare.ts prepare.ts
 COPY start.ts start.ts
 COPY tsconfig.json tsconfig.json
 RUN yarn && yarn build
-RUN cd /yapi \
+RUN mkdir -p /yapi/vendors \
+  && cd /yapi \
   && yarn add deepmerge \
   && cp /start.js /yapi/start.js
 
