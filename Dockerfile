@@ -54,6 +54,8 @@ WORKDIR /yapi
 COPY --from=builder /yapi .
 COPY start.js .
 
+RUN npm install -g npm@6.13.7
+
 EXPOSE 3000
 
 CMD ["node", "./start.js"]
