@@ -30,6 +30,9 @@ WORKDIR /yapi
 COPY --from=builder /yapi .
 COPY start.js .
 
+RUN cd ./vendors \
+  && npm rebuild
+
 EXPOSE 3000
 
 CMD ["node", "./start.js"]
