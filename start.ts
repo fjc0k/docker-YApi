@@ -377,17 +377,25 @@ class Main {
     if (Array.isArray(this.config.plugins) && this.config.plugins.length > 0) {
       const packages = this.config.plugins
         .map((plugin) => `yapi-plugin-${plugin.name}`)
+        .filter(
+          (packageName) =>
+            !fs.existsSync(`/yapi/vendors/node_modules/${packageName}`)
+        )
         .join(' ')
-      await Helper.exec(
-        `
-          cd /yapi/vendors
-          yarn add ${packages} ${
-          this.config.npmRegistry ? `--registry=${this.config.npmRegistry}` : ''
-        }
-          yarn build-client
-        `,
-        (message) => this.log(message)
-      )
+      if (packages.length > 0) {
+        await Helper.exec(
+          `
+            cd /yapi/vendors
+            yarn add ${packages} ${
+            this.config.npmRegistry
+              ? `--registry=${this.config.npmRegistry}`
+              : ''
+          }
+            yarn build-client
+          `,
+          (message) => this.log(message)
+        )
+      }
     }
   }
 
