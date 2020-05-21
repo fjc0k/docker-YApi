@@ -1,5 +1,5 @@
 ######## 构建 ########
-FROM node:14.3.0-alpine3.11 as builder
+FROM node:12.16.3-alpine3.11 as builder
 
 RUN apk add --update --no-cache \
   ca-certificates \
@@ -43,7 +43,7 @@ RUN cd .. \
   && rm -rf **/*.{map,lock,log,md,yml}
 
 ######## 镜像 ########
-FROM node:14.3.0-alpine3.11
+FROM node:12.16.3-alpine3.11
 
 WORKDIR /yapi
 
