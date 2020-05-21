@@ -12,9 +12,7 @@ class Helper {
    * @returns 返回转换后的字符串
    */
   static constCase(str: string): string {
-    return str
-      .replace(/(?<=[a-z])(?=[A-Z])/g, '_')
-      .toUpperCase()
+    return str.replace(/(?<=[a-z])(?=[A-Z])/g, '_').toUpperCase()
   }
 
   /**
@@ -25,10 +23,16 @@ class Helper {
    */
   static isFalsy(value: string): boolean {
     return [
-      'false', 'False', 'FALSE',
-      'off', 'Off', 'OFF',
-      'no', 'No', 'NO',
-      '0',
+      'false',
+      'False',
+      'FALSE',
+      'off',
+      'Off',
+      'OFF',
+      'no',
+      'No',
+      'NO',
+      '0'
     ].includes(value)
   }
 
@@ -39,38 +43,41 @@ class Helper {
    * @param log 记录执行过程
    * @returns 返回执行结果
    */
-  static async exec(cmd: string, log?: (message: string) => any): Promise<{
-    error?: Error,
-    stdout: string,
-    stderr: string,
+  static async exec(
     cmd: string,
-    code?: number,
+    log?: (message: string) => any
+  ): Promise<{
+    error?: Error
+    stdout: string
+    stderr: string
+    cmd: string
+    code?: number
   }> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       const child = childProcess.spawn('sh', ['-c', `set -ex\n${cmd}`], {
         stdio: 'pipe',
-        cwd: process.cwd(),
+        cwd: process.cwd()
       })
 
       let stdout = ''
       let stderr = ''
 
-      child.stdout.on('data', data => {
+      child.stdout.on('data', (data) => {
         log && log(String(data))
         stdout += data
       })
 
-      child.stderr.on('data', data => {
+      child.stderr.on('data', (data) => {
         log && log(String(data))
         stderr += data
       })
 
-      child.on('error', error => {
-        resolve({error, stdout, stderr, cmd})
+      child.on('error', (error) => {
+        resolve({ error, stdout, stderr, cmd })
       })
 
-      child.on('close', code => {
-        resolve({stdout, stderr, cmd, code})
+      child.on('close', (code) => {
+        resolve({ stdout, stderr, cmd, code })
       })
     })
   }
@@ -110,7 +117,7 @@ const configShape = {
     pass: String,
     connectString: String,
     authSource: String,
-    options: JSON,
+    options: JSON
   },
   mail: {
     enable: Boolean,
@@ -119,12 +126,12 @@ const configShape = {
     from: String,
     auth: {
       user: String,
-      pass: String,
+      pass: String
     },
     // 传递给 NodeMailer 的额外参数：
     // 由 Docker-YApi 新增，
     // ref: https://nodemailer.com/smtp/
-    options: JSON,
+    options: JSON
   },
   ldapLogin: {
     enable: Boolean,
@@ -135,14 +142,14 @@ const configShape = {
     searchStandard: String,
     emailPostfix: String,
     emailKey: String,
-    usernameKey: String,
+    usernameKey: String
   },
   plugins: [
     {
       name: String,
-      options: JSON,
-    },
-  ],
+      options: JSON
+    }
+  ]
 } as const
 
 type IConfigShape = typeof configShape
@@ -151,14 +158,14 @@ type GetType<T extends Record<any, any>> = {
   [K in keyof T]: T[K] extends StringConstructor
     ? string
     : T[K] extends BooleanConstructor
-      ? boolean
-      : T[K] extends NumberConstructor
-        ? number
-        : T[K] extends Record<any, any>
-          ? GetType<T[K]>
-          : T[K] extends [infer P]
-            ? Array<GetType<P>>
-            : any
+    ? boolean
+    : T[K] extends NumberConstructor
+    ? number
+    : T[K] extends Record<any, any>
+    ? GetType<T[K]>
+    : T[K] extends [infer P]
+    ? Array<GetType<P>>
+    : any
 }
 
 type IConfig = GetType<IConfigShape>
@@ -173,8 +180,8 @@ class ConfigParser {
     return fs.existsSync('./config.js')
       ? require('./config.js')
       : fs.existsSync('./config.json')
-        ? JSON.parse(fs.readFileSync('./config.json').toString())
-        : {}
+      ? JSON.parse(fs.readFileSync('./config.json').toString())
+      : {}
   }
 
   /**
@@ -188,25 +195,34 @@ class ConfigParser {
   static extractConfigFromEnv(
     configCtx = {},
     shapeCtx = configShape,
-    envPath = ['YAPI'],
+    envPath = ['YAPI']
   ): IConfig {
     for (const [key, shape] of Object.entries(shapeCtx)) {
       const KEY = Helper.constCase(key)
-      if (Array.isArray(shape) || (shape as any) === JSON || typeof shape === 'function') {
+      if (
+        Array.isArray(shape) ||
+        (shape as any) === JSON ||
+        typeof shape === 'function'
+      ) {
         const envKey = envPath.concat(KEY).join('_')
         const envValue = process.env[envKey]
         if (envValue != null) {
-          (configCtx as any)[key] = shape === Boolean
-            ? !Helper.isFalsy(envValue)
-            : (Array.isArray(shape) || (shape as any) === JSON)
+          ;(configCtx as any)[key] =
+            shape === Boolean
+              ? !Helper.isFalsy(envValue)
+              : Array.isArray(shape) || (shape as any) === JSON
               ? JSON.parse(envValue.trim())
               : (shape as any)(envValue)
         }
       } else {
         if ((configCtx as any)[key] == null) {
-          (configCtx as any)[key] = {}
+          ;(configCtx as any)[key] = {}
         }
-        ConfigParser.extractConfigFromEnv((configCtx as any)[key], shape as any, envPath.concat(KEY))
+        ConfigParser.extractConfigFromEnv(
+          (configCtx as any)[key],
+          shape as any,
+          envPath.concat(KEY)
+        )
       }
     }
     return configCtx as any
@@ -220,11 +236,7 @@ class ConfigParser {
    * @returns 返回合并后的配置
    */
   static mergeConfig(config1: IConfig, config2: IConfig): IConfig {
-    return merge(
-      config1,
-      config2,
-      {arrayMerge: (_, source) => source},
-    )
+    return merge(config1, config2, { arrayMerge: (_, source) => source })
   }
 
   /**
@@ -237,7 +249,7 @@ class ConfigParser {
     // 端口固定为 3000，但支持通过环境变量 PORT 改变
     // 注: Heroku 必须使用 PORT 环境变量
     Object.assign(config, {
-      port: process.env.PORT || 3000,
+      port: process.env.PORT || 3000
     })
     return config
   }
@@ -310,7 +322,7 @@ class BootstrapServer {
    * 关闭引导服务。
    */
   async close(): Promise<any> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       this.server.close(resolve)
     })
   }
@@ -354,15 +366,17 @@ class Main {
   async installPluginsIfNeeded() {
     if (Array.isArray(this.config.plugins) && this.config.plugins.length > 0) {
       const packages = this.config.plugins
-        .map(plugin => `yapi-plugin-${plugin.name}`)
+        .map((plugin) => `yapi-plugin-${plugin.name}`)
         .join(' ')
       await Helper.exec(
         `
           cd /yapi/vendors
-          npm install ${packages} ${this.config.npmRegistry ? `--registry=${this.config.npmRegistry}` : ''} --no-audit
-          npm run build-client
+          yarn add ${packages} --exact ${
+          this.config.npmRegistry ? `--registry=${this.config.npmRegistry}` : ''
+        }
+          yarn build-client
         `,
-        message => this.log(message),
+        (message) => this.log(message)
       )
     }
   }
@@ -394,7 +408,9 @@ class Main {
     await this.installPluginsIfNeeded()
 
     this.log('尝试安装 YApi...', true)
-    await Helper.execJsFile('./vendors/server/install.js', message => this.log(message))
+    await Helper.execJsFile('./vendors/server/install.js', (message) =>
+      this.log(message)
+    )
 
     this.log('关闭引导服务...', true)
     await this.bootstrapServer.close()
@@ -404,8 +420,6 @@ class Main {
   }
 }
 
-new Main()
-  .start()
-  .catch(err => {
-    throw err
-  })
+new Main().start().catch((err) => {
+  throw err
+})

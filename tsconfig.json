@@ -1,16 +1,15 @@
 {
   "compilerOptions": {
     "strict": true,
-    "target": "ESNext",
+    "target": "ES2019",
     "module": "commonjs",
     "declaration": false,
     "removeComments": false,
     "moduleResolution": "node",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "incremental": true,
     "skipLibCheck": true,
     "newLine": "LF",
     "sourceMap": false
-  },
+  }
 }
