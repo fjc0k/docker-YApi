@@ -1,6 +1,7 @@
 import fs from 'fs-extra'
 import { join } from 'path'
 import childProcess from 'child_process'
+import { IConfig } from './start'
 
 async function prepare(rootDir: string) {
   // 删除不必要的文件
@@ -11,9 +12,17 @@ async function prepare(rootDir: string) {
     `
   )
 
-  // 写入临时配置文件
+  // 写入默认配置文件
   const configFile = join(rootDir, '../config.json')
-  await fs.writeJSON(configFile, {})
+  await fs.writeJSON(configFile, {
+    // 内置插件
+    plugins: [
+      {
+        name: 'add-user',
+        options: {} as any
+      }
+    ]
+  } as Partial<IConfig>)
 
   // 依赖修复
   const pkgFile = join(rootDir, './package.json')
