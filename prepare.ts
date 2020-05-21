@@ -23,13 +23,13 @@ async function prepare(rootDir: string) {
   > = await fs.readJson(pkgFile)
   for (const deps of [pkgContent.dependencies, pkgContent.devDependencies]) {
     for (const [name, version] of Object.entries(deps)) {
-      if (version.charAt(0) === '^') {
-        deps[name] = version.substr(1)
-      } else if (
+      if (
         ['sass-loader', 'node-sass', 'ghooks', 'ava'].includes(name) ||
         name.includes('eslint')
       ) {
         delete deps[name]
+      } else if (version.charAt(0) === '^') {
+        deps[name] = version.substr(1)
       }
     }
   }
