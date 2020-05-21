@@ -1,6 +1,9 @@
 name: Mirror
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   to_gitee:

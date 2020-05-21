@@ -19,8 +19,8 @@
 - [要求](#要求)
 - [安装](#安装)
 - [如何配置](#如何配置)
-  - [通过 config.json 或者 config.js 配置](#通过-configjson-或者-configjs-配置)
-  - [通过环境变量配置](#通过环境变量配置)
+  - [通过 config.json 或者 config.js 配置（不推荐）](#通过-configjson-或者-configjs-配置不推荐)
+  - [通过环境变量配置（推荐）](#通过环境变量配置推荐)
     - [基础配置](#基础配置)
     - [数据库配置](#数据库配置)
     - [邮件配置](#邮件配置)
@@ -61,7 +61,7 @@ git clone https://gitee.com/fjc0k/docker-YApi.git
 
 为了减少二次配置，`docker-YApi` 新增了 `adminPassword` 选项以设置管理员密码。
 
-### 通过 config.json 或者 config.js 配置
+### 通过 config.json 或者 config.js 配置（不推荐）
 
 `config.json` 是 YApi 官方支持的配置文件，`config.js` 是 `docker-YApi` 扩展支持的配置文件，其实就是将 JSON 数据写成了更简洁的 JavaScript 对象。
 
@@ -72,7 +72,7 @@ git clone https://gitee.com/fjc0k/docker-YApi.git
 ./config.js:/yapi/config.js
 ```
 
-### 通过环境变量配置
+### 通过环境变量配置（推荐）
 
 通过环境变量配置的选项会覆盖通过 `config.json` 或者 `config.js` 配置的选项。
 
@@ -172,7 +172,11 @@ docker-compose logs yapi-web
 本项目额外提供了一个开箱即用的 play 版本（内置了数据库），你可通过它对 YApi 作一个大概的了解：
 
 ```bash
+# 纯粹的
 docker run --rm -p 40001:3000 jayfong/yapi:play
+
+# 带插件的
+docker run --rm -p 40001:3000 -e YAPI_PLUGINS='[{"name":"add-user"}]' jayfong/yapi:play
 ```
 
 你可在本地或 [https://labs.play-with-docker.com/](https://labs.play-with-docker.com/) 上运行上面的命令，然后打开 `http://localhost:40001` 体验 YApi。
