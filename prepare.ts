@@ -4,6 +4,14 @@ import childProcess from 'child_process'
 import { IConfig } from './start'
 
 async function prepare(rootDir: string) {
+  // 内置插件
+  const builtInPlugins: IConfig['plugins'] = [
+    {
+      name: 'add-user',
+      options: {} as any
+    }
+  ]
+
   // 删除不必要的文件
   childProcess.execSync(
     `
@@ -15,13 +23,7 @@ async function prepare(rootDir: string) {
   // 写入默认配置文件
   const configFile = join(rootDir, '../config.json')
   await fs.writeJSON(configFile, {
-    // 内置插件
-    plugins: [
-      {
-        name: 'add-user',
-        options: {} as any
-      }
-    ]
+    plugins: builtInPlugins
   } as Partial<IConfig>)
 
   // 依赖修复
@@ -44,7 +46,11 @@ async function prepare(rootDir: string) {
   Object.assign(deps, {
     'deepmerge': '4.2.2',
     'sass-loader': '7.3.1',
-    'sass': '1.22.10'
+    'sass': '1.22.10',
+    ...builtInPlugins.reduce<Record<string, string>>((res, plugin) => {
+      res[`yapi-plugin-${plugin.name}`] = 'latest'
+      return res
+    }, {})
   })
   pkgContent.dependencies = deps
   await fs.writeJSON(pkgFile, pkgContent)
