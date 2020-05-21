@@ -48,10 +48,14 @@ RUN npm install -g npm@6.13.7
 # 升级部分依赖
 RUN npm install --package-lock-only \
   ykit \
-  node-sass \
   react-dnd \
   react-dnd-html5-backend \
   vm2
+
+# 使用 dart-sass 代替 node-sass
+# ref: https://github.com/webpack-contrib/sass-loader#implementation
+RUN npm uninstall node-sass ghooks \
+  && npm install --package-lock-only sass
 
 # 使用 ci 以安装正确的依赖
 RUN npm ci
