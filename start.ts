@@ -177,10 +177,10 @@ class ConfigParser {
    * @returns 返回获取到的配置
    */
   static extractConfigFromFile(): IConfig {
-    return fs.existsSync('./config.js')
-      ? require('./config.js')
-      : fs.existsSync('./config.json')
-      ? JSON.parse(fs.readFileSync('./config.json').toString())
+    return fs.existsSync('/yapi/config.js')
+      ? require('/yapi/config.js')
+      : fs.existsSync('/yapi/config.json')
+      ? JSON.parse(fs.readFileSync('/yapi/config.json').toString())
       : {}
   }
 
@@ -357,7 +357,7 @@ class Main {
     const mailOptions = finalConfig.mail.options || {}
     delete finalConfig.mail.options
     finalConfig.mail = merge(finalConfig.mail, mailOptions)
-    fs.writeFileSync('./config.json', JSON.stringify(finalConfig))
+    fs.writeFileSync('/yapi/config.json', JSON.stringify(finalConfig))
   }
 
   /**
@@ -371,7 +371,7 @@ class Main {
       await Helper.exec(
         `
           cd /yapi/vendors
-          yarn add ${packages} --exact ${
+          yarn add ${packages} ${
           this.config.npmRegistry ? `--registry=${this.config.npmRegistry}` : ''
         }
           yarn build-client
@@ -408,7 +408,7 @@ class Main {
     await this.installPluginsIfNeeded()
 
     this.log('尝试安装 YApi...', true)
-    await Helper.execJsFile('./vendors/server/install.js', (message) =>
+    await Helper.execJsFile('/yapi/vendors/server/install.js', (message) =>
       this.log(message)
     )
 
@@ -416,7 +416,7 @@ class Main {
     await this.bootstrapServer.close()
 
     this.log('尝试启动 YApi...', true)
-    require('./vendors/server/app.js')
+    require('/yapi/vendors/server/app.js')
   }
 }
 

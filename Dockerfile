@@ -9,16 +9,12 @@ RUN apk add --update --no-cache ca-certificates curl wget cmake build-base git b
 ENV YAPI_VERSION=1.9.1
 
 # 编译脚本
-WORKDIR /
+WORKDIR /yapi/scripts
 COPY package.json package.json
 COPY prepare.ts prepare.ts
 COPY start.ts start.ts
 COPY tsconfig.json tsconfig.json
 RUN yarn && yarn build
-RUN mkdir -p /yapi/vendors \
-  && cd /yapi \
-  && yarn add deepmerge \
-  && cp /start.js /yapi/start.js
 
 WORKDIR /yapi/vendors
 
@@ -32,8 +28,10 @@ RUN git clone \
   --depth 1 \
   https://github.com/YMFE/yapi.git .
 
+RUN cp /yapi/scripts/start.js ./start.js
+
 # 执行一些准备工作
-RUN node /prepare.js $(pwd)
+RUN node /yapi/scripts/prepare.js $(pwd)
 
 # 安装依赖
 RUN yarn
@@ -43,7 +41,7 @@ RUN yarn build-client
 
 # 删除无关文件
 RUN shopt -s globstar \
-  && rm -rf **/*.{map,lock,log,md,yml,yaml}
+  && rm -rf **/*.{map,lock,log,md,yml,yaml} /yapi/scripts
 
 
 ######## 镜像 ########
@@ -55,4 +53,4 @@ COPY --from=builder /yapi .
 
 EXPOSE 3000
 
-CMD ["node", "./start.js"]
+CMD ["node", "/yapi/vendors/start.js"]

@@ -21,20 +21,23 @@ async function prepare(rootDir: string) {
     'dependencies' | 'devDependencies',
     Record<string, string>
   > = await fs.readJson(pkgFile)
-  for (const deps of [pkgContent.dependencies, pkgContent.devDependencies]) {
-    for (const [name, version] of Object.entries(deps)) {
-      if (
-        ['sass-loader', 'node-sass', 'ghooks', 'ava'].includes(name) ||
-        name.includes('eslint')
-      ) {
-        delete deps[name]
-      }
+  Object.assign(pkgContent.dependencies, pkgContent.devDependencies)
+  delete pkgContent.devDependencies
+  const deps = pkgContent.dependencies
+  for (const name of Object.keys(deps)) {
+    if (
+      ['sass-loader', 'node-sass', 'ghooks', 'ava'].includes(name) ||
+      name.includes('eslint')
+    ) {
+      delete deps[name]
     }
   }
-  Object.assign(pkgContent.devDependencies, {
+  Object.assign(deps, {
+    'deepmerge': '4.2.2',
     'sass-loader': '7.3.1',
     'sass': '1.22.10'
   })
+  pkgContent.dependencies = deps
   await fs.writeJSON(pkgFile, pkgContent)
 
   // 支持 adminPassword 配置项
