@@ -1,5 +1,25 @@
 ######## 构建 ########
-FROM jayfong/front-end-builder:latest as builder
+FROM node:14.3.0-alpine3.11 as builder
+
+RUN apk add --update --no-cache \
+  ca-certificates \
+  curl \
+  wget \
+  cmake \
+  build-base \
+  git \
+  bash \
+  python \
+  make \
+  gcc \
+  g++ \
+  zlib-dev \
+  autoconf \
+  automake \
+  file \
+  nasm \
+  && update-ca-certificates \
+  && rm -rf /var/cache/apk/*
 
 ENV YAPI_VERSION=1.9.1
 
@@ -23,15 +43,12 @@ RUN cd .. \
   && rm -rf **/*.{map,lock,log,md,yml}
 
 ######## 镜像 ########
-FROM node:alpine
+FROM node:14.3.0-alpine3.11
 
 WORKDIR /yapi
 
 COPY --from=builder /yapi .
 COPY start.js .
-
-RUN cd ./vendors \
-  && npm rebuild
 
 EXPOSE 3000
 
