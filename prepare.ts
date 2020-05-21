@@ -28,8 +28,6 @@ async function prepare(rootDir: string) {
         name.includes('eslint')
       ) {
         delete deps[name]
-      } else if (version.charAt(0) === '^') {
-        deps[name] = version.substr(1)
       }
     }
   }
@@ -37,7 +35,6 @@ async function prepare(rootDir: string) {
     'sass-loader': '7.3.1',
     'sass': '1.22.10'
   })
-  console.log('pkgContent', pkgContent)
   await fs.writeJSON(pkgFile, pkgContent)
 
   // 支持 adminPassword 配置项
