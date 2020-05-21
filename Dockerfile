@@ -34,9 +34,13 @@ RUN git clone -b "v${YAPI_VERSION}" --single-branch --depth 1 https://github.com
   && sed -i -e 's|</a>|</a><Divider type="vertical" /><a target="view_window" href="https://github.com/fjc0k/docker-YApi#%E5%A6%82%E4%BD%95%E5%8D%87%E7%BA%A7">Docker 版升级指南</a>|' ./client/components/Notify/Notify.js \
   && sed -i -e 's/yapi.commons.generatePassword(/yapi.commons.generatePassword(yapi.WEBCONFIG.adminPassword || /' ./server/install.js \
   && sed -i -e 's/密码："ymfe.org"/密码："${yapi.WEBCONFIG.adminPassword || "ymfe.org"}"/' ./server/install.js
-RUN npm install ykit node-sass react-dnd react-dnd-html5-backend vm2 --package-lock-only
-RUN npm ci
-RUN npm run build-client
+RUN \
+  # 锁定 npm 版本为 6.13.7
+  # issue: https://github.com/npm/cli/issues/1185
+  npm install -g npm@6.13.7 \
+  && npm install ykit node-sass react-dnd react-dnd-html5-backend vm2 --package-lock-only \
+  && npm ci \
+  && npm run build-client
 RUN cd .. \
   && yarn add deepmerge \
   && shopt -s globstar \
