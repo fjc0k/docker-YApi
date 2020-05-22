@@ -12,6 +12,7 @@ ENV YAPI_VERSION=1.9.1
 WORKDIR /yapi/scripts
 COPY package.json package.json
 COPY prepare.ts prepare.ts
+COPY clean.ts clean.ts
 COPY start.ts start.ts
 COPY tsconfig.json tsconfig.json
 RUN yarn && yarn build
@@ -36,16 +37,9 @@ RUN node /yapi/scripts/prepare.js $(pwd)
 # 安装依赖
 RUN yarn
 
-# 删除无关文件
-RUN shopt -s globstar \
-  && rm -rf \
-  **/*.{map,lock,log,md,yml,yaml,ts,txt} \
-  **/node_modules/*/**/.[!.]* \
-  **/__*__ \
-  **/{tsconfig.json,Makefile,CHANGELOG} \
-  **/node_modules/**/*.{test,spec,min,umd,es,esm}.* \
-  **/{test,tests,example,examples,doc,docs,coverage,demo,umd,es,esm}/ \
-  /yapi/scripts
+# 清理文件
+RUN node /yapi/scripts/clean.js $(pwd) \
+  && rm -rf /yapi/scripts
 
 # 构建应用
 RUN yarn build-client
