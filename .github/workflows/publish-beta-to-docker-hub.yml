@@ -3,19 +3,19 @@ name: Publish Beta Version to Docker Hub
 on:
   push:
     branches:
-      - beta
+      - test
 
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-      with:
-        ref: beta
-    - name: build
-      run: |
-        docker login -u jayfong -p ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-        docker build -t jayfong/yapi:latest -t jayfong/yapi:beta .
-        docker build -t jayfong/yapi:play-beta -f ./Dockerfile.web .
-        docker push jayfong/yapi:beta
-        docker push jayfong/yapi:play-beta
+      - uses: actions/checkout@v2
+        with:
+          ref: test
+      - name: build
+        run: |
+          docker login -u jayfong -p ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+          docker build -t jayfong/yapi:latest -t jayfong/yapi:beta .
+          docker build -t jayfong/yapi:play-beta -f ./Dockerfile.web .
+          docker push jayfong/yapi:beta
+          docker push jayfong/yapi:play-beta

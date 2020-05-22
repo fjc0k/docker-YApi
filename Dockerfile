@@ -41,7 +41,7 @@ RUN yarn build-client
 
 # 删除无关文件
 RUN shopt -s globstar \
-  && rm -rf **/*.{map,lock,log,md,yml,yaml} /yapi/scripts
+  && rm -rf **/*.{map,lock,log,md,yml,yaml,ts} **/.* **/__*__ **/{test,tests,coverage,demo,example,doc,docs}/ /yapi/scripts
 
 
 ######## 镜像 ########
