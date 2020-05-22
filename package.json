@@ -10,6 +10,7 @@
     "@types/node": "12.12.21",
     "deepmerge": "4.2.2",
     "fs-extra": "9.0.0",
+    "globby": "11.0.0",
     "typescript": "3.9.3"
   }
 }
