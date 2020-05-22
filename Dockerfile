@@ -10,11 +10,7 @@ ENV YAPI_VERSION=1.9.1
 
 # 编译脚本
 WORKDIR /yapi/scripts
-COPY package.json package.json
-COPY prepare.ts prepare.ts
-COPY clean.ts clean.ts
-COPY start.ts start.ts
-COPY tsconfig.json tsconfig.json
+COPY . .
 RUN yarn && yarn build
 
 WORKDIR /yapi/vendors
