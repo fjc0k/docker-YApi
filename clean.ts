@@ -12,6 +12,12 @@ async function clean(rootDir: string) {
     pkgFilePath('mutationobserver-shim/dist/mutationobserver.min.js'),
     pkgFilePath('history/cjs/history.min.js'),
     pkgFilePath('react-is/cjs/react-is.production.min.js'),
+    pkgFilePath('scheduler/cjs/scheduler.production.min.js'),
+    pkgFilePath('resolve-pathname/cjs/resolve-pathname.min.js'),
+    pkgFilePath('value-equal/cjs/value-equal.min.js'),
+    pkgFilePath('scheduler/cjs/scheduler.production.min.js'),
+    pkgFilePath('jsondiffpatch/dist/jsondiffpatch.umd.js'),
+    pkgFilePath('ajv-i18n/localize/es'),
     pkgFilePath('svgo/.svgo.yml'),
     pkgFilePath('.bin'),
     ...(await globby('**/*.min.*', {
@@ -23,7 +29,7 @@ async function clean(rootDir: string) {
     const { dir, base } = parse(filePath)
     return {
       from: filePath,
-      to: join(dir, base.replace(/\./g, ''))
+      to: join(dir, 'r_' + base.replace(/\./g, ''))
     }
   })
   await Promise.all(
