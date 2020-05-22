@@ -36,19 +36,19 @@ RUN node /yapi/scripts/prepare.js $(pwd)
 # 安装依赖
 RUN yarn
 
-# 构建应用
-RUN yarn build-client
-
 # 删除无关文件
 RUN shopt -s globstar \
   && rm -rf \
   **/*.{map,lock,log,md,yml,yaml,ts,txt} \
   **/.[!.]* \
   **/__*__ \
+  **/{tsconfig.json,Makefile,CHANGELOG} \
   **/node_modules/**/*.{test,spec,min,umd,es,esm}.* \
-  **/{test,tests,example,examples,doc,docs,coverage,demo,CHANGELOG,Makefile,tsconfig.json,umd,es,esm}/ \
+  **/{test,tests,example,examples,doc,docs,coverage,demo,umd,es,esm}/ \
   /yapi/scripts
 
+# 构建应用
+RUN yarn build-client
 
 ######## 镜像 ########
 FROM node:12.16.3-alpine3.11
