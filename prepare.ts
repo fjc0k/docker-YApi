@@ -59,6 +59,8 @@ async function prepare(rootDir: string) {
     'deepmerge': '4.2.2',
     'sass-loader': '7.3.1',
     'sass': '1.22.10',
+    'url-loader': '0.5.9',
+    'babel-preset-env': '1.6.1',
     ...builtInPlugins.reduce<Record<string, string>>((res, plugin) => {
       res[`yapi-plugin-${plugin.name}`] = 'latest'
       return res
