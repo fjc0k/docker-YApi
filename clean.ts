@@ -31,17 +31,20 @@ async function clean(rootDir: string) {
       await fs.rename(from, to)
     })
   )
-  childProcess.execSync(`
-    cd ${rootDir}
-    shopt -s globstar
-    rm -rf \\
-      **/*.{map,lock,log,md,yml,yaml,ts,txt} \\
-      **/.[!.]* \\
-      **/__*__ \\
-      **/{tsconfig.json,Makefile,CHANGELOG} \\
-      **/*.{test,spec,min,umd,es,esm}.* \\
-      **/{test,tests,example,examples,doc,docs,coverage,demo,umd,es,esm}/
-  `)
+  childProcess.execSync(
+    `
+      cd ${rootDir}
+      shopt -s globstar
+      rm -rf \\
+        **/*.{map,lock,log,md,yml,yaml,ts,txt} \\
+        **/.[!.]* \\
+        **/__*__ \\
+        **/{tsconfig.json,Makefile,CHANGELOG} \\
+        **/*.{test,spec,min,umd,es,esm}.* \\
+        **/{test,tests,example,examples,doc,docs,coverage,demo,umd,es,esm}/
+    `,
+    { shell: '/bin/bash' }
+  )
   await Promise.all(
     reservedFiles.map(async ({ from, to }) => {
       await fs.rename(to, from)
