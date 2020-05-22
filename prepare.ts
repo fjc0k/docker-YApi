@@ -1,6 +1,5 @@
 import fs from 'fs-extra'
 import { join } from 'path'
-import childProcess from 'child_process'
 import { IConfig } from './start'
 
 async function prepare(rootDir: string) {
@@ -11,14 +10,6 @@ async function prepare(rootDir: string) {
       options: {} as any
     }
   ]
-
-  // 删除不必要的文件
-  childProcess.execSync(
-    `
-      cd ${rootDir}
-      rm -rf .git .github docs test *.{jpg,md} .npmrc package-lock.json
-    `
-  )
 
   // 写入默认配置文件
   const configFile = join(rootDir, '../config.json')

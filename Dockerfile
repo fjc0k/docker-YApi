@@ -10,16 +10,10 @@ ENV YAPI_VERSION=1.9.1
 
 # 编译脚本
 WORKDIR /yapi/scripts
-COPY package.json package.json
-COPY prepare.ts prepare.ts
-COPY start.ts start.ts
-COPY tsconfig.json tsconfig.json
+COPY . .
 RUN yarn && yarn build
 
 WORKDIR /yapi/vendors
-
-# 使用 bash 作为 shell 以支持下面要使用的 globstar
-SHELL ["/bin/bash", "-c"]
 
 # 拉取 YApi 源码
 RUN git clone \
@@ -28,6 +22,7 @@ RUN git clone \
   --depth 1 \
   https://github.com/YMFE/yapi.git .
 
+# 拷贝启动脚本
 RUN cp /yapi/scripts/start.js ./start.js
 
 # 执行一些准备工作
@@ -36,12 +31,12 @@ RUN node /yapi/scripts/prepare.js $(pwd)
 # 安装依赖
 RUN yarn
 
+# 清理文件
+RUN node /yapi/scripts/clean.js $(pwd) \
+  && rm -rf /yapi/scripts
+
 # 构建应用
 RUN yarn build-client
-
-# 删除无关文件
-RUN shopt -s globstar \
-  && rm -rf **/*.{map,lock,log,md,yml,yaml} /yapi/scripts
 
 
 ######## 镜像 ########
