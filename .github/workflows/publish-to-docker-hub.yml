@@ -14,11 +14,9 @@ jobs:
           qemu-version: 4.2.0-7
       - name: build & publish
         run: |
-          VERSION=${GITHUB_REF:10}
           docker login \
             --username jayfong \
             --password ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
           docker buildx build \
             --platform linux/arm/v7 \
-            --tag jayfong/yapi:latest \
-            --tag jayfong/yapi:${VERSION} .
+            --tag jayfong/yapi:latest .
