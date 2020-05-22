@@ -40,7 +40,7 @@ RUN yarn
 RUN shopt -s globstar \
   && rm -rf \
   **/*.{map,lock,log,md,yml,yaml,ts,txt} \
-  **/.[!.]* \
+  **/node_modules/*/**/.[!.]* \
   **/__*__ \
   **/{tsconfig.json,Makefile,CHANGELOG} \
   **/node_modules/**/*.{test,spec,min,umd,es,esm}.* \
