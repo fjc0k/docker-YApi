@@ -45,8 +45,8 @@ RUN shopt -s globstar \
   **/*.{map,lock,log,md,yml,yaml,ts,txt} \
   **/.[!.]* \
   **/__*__ \
-  **/*.{test,min,umd}.* \
-  **/{test,tests,example,examples,doc,docs,coverage,demo,CHANGELOG,Makefile,tsconfig.json,umd} \
+  **/node_modules/**/*.{test,spec,min,umd,es,esm}.* \
+  **/{test,tests,example,examples,doc,docs,coverage,demo,CHANGELOG,Makefile,tsconfig.json,umd,es,esm}/ \
   /yapi/scripts
 
 
