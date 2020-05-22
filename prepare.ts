@@ -37,8 +37,20 @@ async function prepare(rootDir: string) {
   const deps = pkgContent.dependencies
   for (const name of Object.keys(deps)) {
     if (
-      ['sass-loader', 'node-sass', 'ghooks', 'ava'].includes(name) ||
-      name.includes('eslint')
+      [
+        'sass-loader',
+        'node-sass',
+        'ghooks',
+        'ava',
+        'rewire',
+        'react-scripts',
+        'nodemon',
+        'validate-commit-msg',
+        'webpack-dev-middleware'
+      ].includes(name) ||
+      name.includes('eslint') ||
+      name.includes('redux-devtools') ||
+      name.includes('ydoc')
     ) {
       delete deps[name]
     }
