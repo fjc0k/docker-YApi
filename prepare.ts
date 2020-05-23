@@ -7,20 +7,20 @@ async function prepare(rootDir: string) {
   const builtInPlugins: IConfig['plugins'] = [
     {
       name: 'add-user',
-      options: {} as any
-    }
+      options: {} as any,
+    },
   ]
 
   // 写入默认配置文件
   const configFile = join(rootDir, '../config.json')
   await fs.writeJSON(configFile, {
-    plugins: builtInPlugins
+    plugins: builtInPlugins,
   } as Partial<IConfig>)
 
   // 依赖修复
   const pkgFile = join(rootDir, './package.json')
   const pkgContent: Record<
-    'dependencies' | 'devDependencies',
+    'dependencies' | 'devDependencies' | 'resolutions',
     Record<string, string>
   > = await fs.readJson(pkgFile)
   Object.assign(pkgContent.dependencies, pkgContent.devDependencies)
@@ -37,7 +37,7 @@ async function prepare(rootDir: string) {
         'react-scripts',
         'nodemon',
         'validate-commit-msg',
-        'webpack-dev-middleware'
+        'webpack-dev-middleware',
       ].includes(name) ||
       name.includes('eslint') ||
       name.includes('redux-devtools') ||
@@ -59,9 +59,15 @@ async function prepare(rootDir: string) {
     ...builtInPlugins.reduce<Record<string, string>>((res, plugin) => {
       res[`yapi-plugin-${plugin.name}`] = 'latest'
       return res
-    }, {})
+    }, {}),
   })
   pkgContent.dependencies = deps
+  // 统一对 antd 的版本依赖
+  // YApi 自身锁定了 antd 版本，但它的依赖中有依赖的 antd 的并没有锁定或锁定了不一致的版本
+  // issue: https://github.com/fjc0k/docker-YApi/issues/31
+  pkgContent.resolutions = {
+    '**/antd': pkgContent.dependencies.antd,
+  }
   await fs.writeJSON(pkgFile, pkgContent)
 
   // 支持 adminPassword 配置项
@@ -70,11 +76,11 @@ async function prepare(rootDir: string) {
   installFileContent = installFileContent
     .replace(
       'yapi.commons.generatePassword(',
-      'yapi.commons.generatePassword(yapi.WEBCONFIG.adminPassword || '
+      'yapi.commons.generatePassword(yapi.WEBCONFIG.adminPassword || ',
     )
     .replace(
       '密码："ymfe.org"',
-      '密码："${yapi.WEBCONFIG.adminPassword || "ymfe.org"}"'
+      '密码："${yapi.WEBCONFIG.adminPassword || "ymfe.org"}"',
     )
   await fs.writeFile(installFile, installFileContent)
 
@@ -83,7 +89,7 @@ async function prepare(rootDir: string) {
   let ykitConfigContent = await fs.readFile(ykitConfigFile, 'utf8')
   ykitConfigContent = ykitConfigContent.replace(
     /baseConfig\.module\.preLoaders\.push.*?eslint-loader.*?;/s,
-    ''
+    '',
   )
   await fs.writeFile(ykitConfigFile, ykitConfigContent)
 }

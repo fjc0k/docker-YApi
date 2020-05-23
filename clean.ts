@@ -13,7 +13,6 @@ async function clean(rootDir: string) {
     pkgFilePath('react-dom/cjs/react-dom.production.min.js'),
     pkgFilePath('react-is/cjs/react-is.production.min.js'),
     pkgFilePath('scheduler/cjs/scheduler.production.min.js'),
-    pkgFilePath('mutationobserver-shim/dist/mutationobserver.min.js'),
     pkgFilePath('history/cjs/history.min.js'),
     pkgFilePath('resolve-pathname/cjs/resolve-pathname.min.js'),
     pkgFilePath('value-equal/cjs/value-equal.min.js'),
@@ -24,20 +23,20 @@ async function clean(rootDir: string) {
     ...(await globby('**/*.min.*', {
       absolute: true,
       cwd: rootDir,
-      ignore: ['**/node_modules/**']
-    }))
+      ignore: ['**/node_modules/**'],
+    })),
   ].map((filePath) => {
     const { dir, base } = parse(filePath)
     return {
       from: filePath,
-      to: join(dir, 'r_' + base.replace(/\./g, ''))
+      to: join(dir, 'r_' + base.replace(/\./g, '')),
     }
   })
 
   await Promise.all(
     reservedFiles.map(async ({ from, to }) => {
       await fs.rename(from, to)
-    })
+    }),
   )
 
   childProcess.execSync(
@@ -52,13 +51,13 @@ async function clean(rootDir: string) {
         **/*.{test,spec,min,umd,es,esm}.* \\
         **/{test,tests,example,examples,doc,docs,coverage,demo,umd,es,esm}/
     `,
-    { shell: '/bin/bash' }
+    { shell: '/bin/bash' },
   )
 
   await Promise.all(
     reservedFiles.map(async ({ from, to }) => {
       await fs.rename(to, from)
-    })
+    }),
   )
 }
 

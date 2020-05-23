@@ -32,7 +32,7 @@ class Helper {
       'no',
       'No',
       'NO',
-      '0'
+      '0',
     ].includes(value)
   }
 
@@ -45,7 +45,7 @@ class Helper {
    */
   static async exec(
     cmd: string,
-    log?: (message: string) => any
+    log?: (message: string) => any,
   ): Promise<{
     error?: Error
     stdout: string
@@ -56,7 +56,7 @@ class Helper {
     return new Promise((resolve) => {
       const child = childProcess.spawn('sh', ['-c', `set -ex\n${cmd}`], {
         stdio: 'pipe',
-        cwd: process.cwd()
+        cwd: process.cwd(),
       })
 
       let stdout = ''
@@ -117,7 +117,7 @@ const configShape = {
     pass: String,
     connectString: String,
     authSource: String,
-    options: JSON
+    options: JSON,
   },
   mail: {
     enable: Boolean,
@@ -126,12 +126,12 @@ const configShape = {
     from: String,
     auth: {
       user: String,
-      pass: String
+      pass: String,
     },
     // 传递给 NodeMailer 的额外参数：
     // 由 Docker-YApi 新增，
     // ref: https://nodemailer.com/smtp/
-    options: JSON
+    options: JSON,
   },
   ldapLogin: {
     enable: Boolean,
@@ -142,14 +142,14 @@ const configShape = {
     searchStandard: String,
     emailPostfix: String,
     emailKey: String,
-    usernameKey: String
+    usernameKey: String,
   },
   plugins: [
     {
       name: String,
-      options: JSON
-    }
-  ]
+      options: JSON,
+    },
+  ],
 } as const
 
 type IConfigShape = typeof configShape
@@ -195,7 +195,7 @@ class ConfigParser {
   static extractConfigFromEnv(
     configCtx = {},
     shapeCtx = configShape,
-    envPath = ['YAPI']
+    envPath = ['YAPI'],
   ): IConfig {
     for (const [key, shape] of Object.entries(shapeCtx)) {
       const KEY = Helper.constCase(key)
@@ -221,7 +221,7 @@ class ConfigParser {
         ConfigParser.extractConfigFromEnv(
           (configCtx as any)[key],
           shape as any,
-          envPath.concat(KEY)
+          envPath.concat(KEY),
         )
       }
     }
@@ -257,7 +257,7 @@ class ConfigParser {
     // 端口固定为 3000，但支持通过环境变量 PORT 改变
     // 注: Heroku 必须使用 PORT 环境变量
     Object.assign(config, {
-      port: process.env.PORT || 3000
+      port: process.env.PORT || 3000,
     })
     return config
   }
@@ -377,7 +377,7 @@ class Main {
         .map((plugin) => `yapi-plugin-${plugin.name}`)
         .filter(
           (packageName) =>
-            !fs.existsSync(`/yapi/vendors/node_modules/${packageName}`)
+            !fs.existsSync(`/yapi/vendors/node_modules/${packageName}`),
         )
         .join(' ')
       if (packages.length > 0) {
@@ -391,7 +391,7 @@ class Main {
           }
             yarn build-client
           `,
-          (message) => this.log(message)
+          (message) => this.log(message),
         )
       }
     }
@@ -425,7 +425,7 @@ class Main {
 
     this.log('尝试安装 YApi...', true)
     await Helper.execJsFile('/yapi/vendors/server/install.js', (message) =>
-      this.log(message)
+      this.log(message),
     )
 
     this.log('关闭引导服务...', true)
