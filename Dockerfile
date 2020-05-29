@@ -6,7 +6,7 @@ RUN apk add --update --no-cache ca-certificates curl wget cmake build-base git b
   && update-ca-certificates
 
 # YApi 版本
-ENV YAPI_VERSION=1.9.1
+ENV YAPI_VERSION=1.9.2
 
 # 编译脚本
 WORKDIR /yapi/scripts
