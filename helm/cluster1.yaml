@@ -1,0 +1,11 @@
+env:
+  YAPI_ADMIN_ACCOUNT: 'admin@myorg'
+  YAPI_ADMIN_PASSWORD: '******'
+  YAPI_CLOSE_REGISTER: true
+  YAPI_DB_CONNECT_STRING: 'mongodb://username:password@mongo-cluster1-rs0.psmdb.svc.cluster.local/yapi?replicaSet=rs0&ssl=false&slaveOk=true'
+  YAPI_DB_DATABASE: 'yapi'
+  YAPI_DB_USER: 'username'
+  YAPI_DB_PASS: 'password'
+  YAPI_MAIL_ENABLE: false
+  YAPI_LDAP_LOGIN_ENABLE: false
+  YAPI_PLUGINS: []
