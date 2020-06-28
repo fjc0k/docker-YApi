@@ -9,20 +9,20 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: set up docker-buildx
-      uses: crazy-max/ghaction-docker-buildx@v1
-      with:
-        buildx-version: v0.4.1
-        qemu-version: 4.2.0-7
-    - name: build & publish
-      run: |
-        VERSION=${GITHUB_REF:10}
-        docker login \
-          --username jayfong \
-          --password ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-        docker buildx build \
-          --platform linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x \
-          --push \
-          --tag jayfong/yapi:latest \
-          --tag jayfong/yapi:${VERSION} .
+      - uses: actions/checkout@v2
+      - name: set up docker-buildx
+        uses: crazy-max/ghaction-docker-buildx@v1
+        with:
+          buildx-version: v0.4.1
+          qemu-version: 4.2.0-7
+      - name: build & publish
+        run: |
+          VERSION=${GITHUB_REF:10}
+          docker login \
+            --username jayfong \
+            --password ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+          docker buildx build \
+            --platform linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x \
+            --push \
+            --tag jayfong/yapi:latest \
+            --tag jayfong/yapi:${VERSION} .

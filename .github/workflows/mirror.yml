@@ -9,12 +9,12 @@ jobs:
   to_gitee:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-      with:
-        # v2 中该项默认为 1，必须指定为 0 以拉取所有记录，
-        # 否则在 mirror 去 gitee 时会报 shallow update not allowed 错误
-        fetch-depth: 0
-    - uses: pixta-dev/repository-mirroring-action@v1
-      with:
-        target_repo_url: git@gitee.com:fjc0k/docker-YApi.git
-        ssh_private_key: ${{ secrets.GITEE_SSH_KEY }}
+      - uses: actions/checkout@v2
+        with:
+          # v2 中该项默认为 1，必须指定为 0 以拉取所有记录，
+          # 否则在 mirror 去 gitee 时会报 shallow update not allowed 错误
+          fetch-depth: 0
+      - uses: pixta-dev/repository-mirroring-action@v1
+        with:
+          target_repo_url: git@gitee.com:fjc0k/docker-YApi.git
+          ssh_private_key: ${{ secrets.GITEE_SSH_KEY }}
