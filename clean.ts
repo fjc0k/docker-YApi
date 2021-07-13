@@ -35,7 +35,7 @@ async function clean(rootDir: string) {
 
   await Promise.all(
     reservedFiles.map(async ({ from, to }) => {
-      await fs.rename(from, to)
+      await fs.rename(from, to).catch(() => {})
     }),
   )
 
@@ -56,7 +56,7 @@ async function clean(rootDir: string) {
 
   await Promise.all(
     reservedFiles.map(async ({ from, to }) => {
-      await fs.rename(to, from)
+      await fs.rename(to, from).catch(() => {})
     }),
   )
 }
