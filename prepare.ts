@@ -23,6 +23,7 @@ async function prepare(rootDir: string) {
     'dependencies' | 'devDependencies' | 'resolutions',
     Record<string, string>
   > = await fs.readJson(pkgFile)
+  const dependencies = Object.assign({}, pkgContent.dependencies)
   Object.assign(pkgContent.dependencies, pkgContent.devDependencies)
   delete pkgContent.devDependencies
   const deps = pkgContent.dependencies
@@ -44,6 +45,9 @@ async function prepare(rootDir: string) {
       name.includes('ydoc')
     ) {
       delete deps[name]
+    } else if (dependencies[name]) {
+      // 锁定所有 dependencies 版本
+      deps[name] = deps[name].replace(/^(\^|~)/, '')
     }
   }
   Object.assign(deps, {
