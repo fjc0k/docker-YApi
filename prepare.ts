@@ -96,6 +96,16 @@ async function prepare(rootDir: string) {
     '',
   )
   await fs.writeFile(ykitConfigFile, ykitConfigContent)
+
+  // 修复侧边栏 menu 闪烁问题
+  const commonCssPath = join(rootDir, './client/styles/common.scss')
+  let commonCssPathContent = await fs.readFile(commonCssPath, 'utf8')
+  commonCssPathContent =
+    commonCssPathContent +
+    `.ant-menu-inline .ant-menu-item,.ant-menu-inline .ant-menu-submenu-title {
+    width: 100%;
+  }`
+  await fs.writeFile(commonCssPath, commonCssPathContent)
 }
 
 prepare(process.argv[2])
