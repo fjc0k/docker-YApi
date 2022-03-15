@@ -5,10 +5,10 @@ services:
     image: jayfong/yapi:latest
     container_name: yapi-web
     ports:
-      - 40001:3000
+      - 80:3000
     environment:
-      - YAPI_ADMIN_ACCOUNT=admin@docker.yapi
-      - YAPI_ADMIN_PASSWORD=adm1n
+      - YAPI_ADMIN_ACCOUNT=lijinsong@grayrhythm.com
+      - YAPI_ADMIN_PASSWORD=12345678
       - YAPI_CLOSE_REGISTER=true
       - YAPI_DB_SERVERNAME=yapi-mongo
       - YAPI_DB_PORT=27017
