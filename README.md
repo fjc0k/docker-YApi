@@ -146,7 +146,7 @@ git clone https://gitee.com/fjc0k/docker-YApi.git
 若你修改了配置，务必重启应用才能生效：
 
 ```bash
-docker-compose restart yapi-web
+docker-compose restart yapi-web如不生效执行docker-compose up -d yapi-web即可
 ```
 
 ## 如何升级
