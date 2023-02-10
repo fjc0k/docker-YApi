@@ -9,13 +9,10 @@ ENV YAPI_DB_DATABASE=yapi
 ENV YAPI_MAIL_ENABLE=false
 ENV YAPI_LDAP_LOGIN_ENABLE=false
 ENV YAPI_PLUGINS=[]
-ENV PORT=8080
 
 RUN echo 'http://dl-cdn.alpinelinux.org/alpine/v3.6/main' >> /etc/apk/repositories && \
   echo 'http://dl-cdn.alpinelinux.org/alpine/v3.6/community' >> /etc/apk/repositories && \
   apk add --update --no-cache mongodb && \
   mkdir -p /data/db
-
-EXPOSE 8080
 
 CMD mongod --fork --logpath=mongodb.log && node /yapi/vendors/start.js
