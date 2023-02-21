@@ -374,11 +374,15 @@ class Main {
   async installPluginsIfNeeded() {
     if (Array.isArray(this.config.plugins) && this.config.plugins.length > 0) {
       const packages = this.config.plugins
-        .map((plugin) => `yapi-plugin-${plugin.name}`)
-        .filter(
-          (packageName) =>
-            !fs.existsSync(`/yapi/vendors/node_modules/${packageName}`),
-        )
+        .map((plugin) =>{ 
+          let localPkg=`/yapi/vendors/node_modules/yapi-plugin-${plugin.name}`;
+          if(fs.existsSync(localPkg)){
+            this.log('加载本地插件：'+localPkg)
+            return `file:${localPkg}`
+          }else{
+            return `yapi-plugin-${plugin.name}`
+          }
+        })
         .join(' ')
       if (packages.length > 0) {
         await Helper.exec(
