@@ -71,6 +71,7 @@ async function prepare(rootDir: string) {
   // issue: https://github.com/fjc0k/docker-YApi/issues/31
   pkgContent.resolutions = {
     '**/antd': pkgContent.dependencies.antd,
+    '**/commander': '^8',
   }
   await fs.writeJSON(pkgFile, pkgContent)
 
